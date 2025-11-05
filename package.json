@@ -2,12 +2,15 @@
   "name": "nextjs-shadcn",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev -H 0.0.0.0 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "bunx tsc --noEmit && next lint",
-    "format": "bunx biome format --write"
+    "format": "bunx biome format --write",
+    "bulk-upload": "node scripts/bulk-upload.js",
+    "bulk-upload:test": "SOURCE_DIR=./test-documents CONCURRENCY=5 node scripts/bulk-upload.js"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",

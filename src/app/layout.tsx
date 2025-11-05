@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientBody from "./ClientBody";
-import Script from "next/script";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import { DocumentProvider } from "@/contexts/DocumentContext";
 import { BookmarkProvider } from "@/contexts/BookmarkContext";
@@ -29,12 +28,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <head>
-        <Script
-          crossOrigin="anonymous"
-          src="//unpkg.com/same-runtime/dist/index.global.js"
-        />
-      </head>
       <body suppressHydrationWarning className="antialiased">
         <ClientBody>
           <DocumentProvider>

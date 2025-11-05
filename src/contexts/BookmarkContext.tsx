@@ -25,25 +25,35 @@ const STORAGE_KEY = "regulatory-bookmarks";
 
 export function BookmarkProvider({ children }: { children: ReactNode }) {
   const [bookmarks, setBookmarks] = useState<BookmarkedDocument[]>([]);
+  const [isClient, setIsClient] = useState(false);
 
-  // Load bookmarks from localStorage on mount
+  // Set client flag after mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setBookmarks(JSON.parse(stored));
-      } catch (error) {
-        console.error("Failed to load bookmarks:", error);
-      }
-    }
+    setIsClient(true);
   }, []);
 
-  // Save bookmarks to localStorage whenever they change
+  // Load bookmarks from localStorage on mount (client-side only)
   useEffect(() => {
-    if (bookmarks.length > 0 || localStorage.getItem(STORAGE_KEY)) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+    if (isClient && typeof window !== 'undefined') {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          setBookmarks(JSON.parse(stored));
+        } catch (error) {
+          console.error("Failed to load bookmarks:", error);
+        }
+      }
     }
-  }, [bookmarks]);
+  }, [isClient]);
+
+  // Save bookmarks to localStorage whenever they change (client-side only)
+  useEffect(() => {
+    if (isClient && typeof window !== 'undefined') {
+      if (bookmarks.length > 0 || localStorage.getItem(STORAGE_KEY)) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+      }
+    }
+  }, [bookmarks, isClient]);
 
   const addBookmark = (doc: BookmarkedDocument) => {
     setBookmarks((prev) => {

@@ -1,47 +1,48 @@
 /**
- * Supabase 客户端配置
- * 
- * 这个文件提供了两个 Supabase 客户端实例：
- * 1. supabase - 用于客户端操作（使用 anon key）
- * 2. supabaseAdmin - 用于服务器端操作（使用 service role key）
+ * Supabase 客户端配置（防御性懒加载）
+ *
+ * 变更要点：
+ * - 不在模块顶层抛错或创建客户端，避免初始化阶段白屏
+ * - 导出 getSupabase() 按需创建客户端（仅使用 anon key）
+ * - 仅在服务端导出 supabaseAdmin，客户端不打包 service role key
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-// 验证环境变量
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
-}
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
-}
+const isServer = typeof window === 'undefined';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+let browserClient: SupabaseClient | null = null;
 
 /**
- * 客户端 Supabase 实例
- * 使用 anon key，适用于客户端操作
- * 受 Row Level Security (RLS) 策略保护
+ * 懒加载客户端实例（仅使用 anon key，适用于客户端）
  */
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
-/**
- * 管理员 Supabase 实例
- * 使用 service role key，仅用于服务器端 API 路由
- * ⚠️ 警告：此客户端绕过 RLS 策略，拥有完全权限
- * 切勿在客户端代码中使用！
- */
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
+export function getSupabase(): SupabaseClient {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('Supabase public env missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.');
   }
-);
+  if (!browserClient) {
+    browserClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  return browserClient;
+}
+
+/**
+ * 管理员 Supabase 实例（仅服务端可用）
+ * 使用 service role key，绕过 RLS，切勿在客户端使用
+ */
+const ADMIN_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export const supabaseAdmin: SupabaseClient | undefined =
+  isServer && ADMIN_URL && SERVICE_ROLE_KEY
+    ? createClient(ADMIN_URL, SERVICE_ROLE_KEY, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      })
+    : undefined;
 
 /**
  * 数据库类型定义

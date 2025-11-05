@@ -20,10 +20,7 @@ export function Sidebar() {
 
   const navigation: NavigationItem[] = [
     { name: "Dashboard", href: "/", icon: "📊", isEmoji: true },
-    { name: "Regulatory Compass", href: "/regulatory-compass", icon: "🧭", isEmoji: true },
     { name: "Documents", href: "/documents", icon: FileText, isEmoji: false },
-    { name: "FDA Guidance Library", href: "/fda-guidance", icon: "📚", isEmoji: true },
-    { name: "FDA Tracker", href: "/fda-tracker", icon: "📈", isEmoji: true },
     { name: "Bookmarks", href: "/bookmarks", icon: Bookmark, isEmoji: false },
     { name: "Alerts", href: "/alerts", icon: Bell, isEmoji: false },
     { name: "Contact Us", href: "/contact", icon: MessageSquare, isEmoji: false },

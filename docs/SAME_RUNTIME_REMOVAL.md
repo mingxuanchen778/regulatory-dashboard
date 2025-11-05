@@ -359,9 +359,80 @@ npm run dev
 
 ---
 
-**修复完成时间**：2025-01-05  
-**修复人员**：Augment Agent  
+**修复完成时间**：2025-01-05
+**修复人员**：Augment Agent
 **验证状态**：等待 Vercel 部署完成后验证
+
+---
+
+## 🔧 补充修复：锁文件问题
+
+### 问题发现
+
+在第一次修复后，Vercel 部署仍然失败，错误信息：
+
+```
+Module not found: Can't resolve 'same-runtime/dist/jsx-runtime'
+```
+
+### 根本原因
+
+虽然从 `package.json` 中删除了 `same-runtime`，但是：
+- ❌ `package-lock.json` 仍然包含 same-runtime 引用
+- ❌ `bun.lock` 也包含 same-runtime 引用
+
+Vercel 在构建时使用 `package-lock.json`，所以仍然尝试安装和使用 same-runtime。
+
+### 解决方案
+
+1. **删除锁文件**：
+   ```bash
+   del package-lock.json
+   del bun.lock
+   ```
+
+2. **清除 npm 缓存**：
+   ```bash
+   npm cache clean --force
+   ```
+
+3. **删除 node_modules**：
+   ```bash
+   Remove-Item -Recurse -Force node_modules
+   ```
+
+4. **重新安装依赖**：
+   ```bash
+   npm install
+   ```
+
+   结果：`removed 63 packages` - same-runtime 及其依赖已完全移除
+
+5. **验证清理**：
+   ```bash
+   findstr /C:"same-runtime" package-lock.json
+   # 无输出 = 成功清理
+   ```
+
+6. **提交更改**：
+   ```bash
+   git add .
+   git commit -m "fix: regenerate package-lock.json to remove same-runtime references"
+   git push origin main
+   ```
+
+### 修改的文件（第二次修复）
+
+| 文件 | 修改内容 | 状态 |
+|------|---------|------|
+| `bun.lock` | 删除（项目不使用 bun） | ✅ 完成 |
+| `package-lock.json` | 重新生成，移除 same-runtime 引用 | ✅ 完成 |
+
+### Git 提交信息
+
+- **Commit Hash**: `57dd7db`
+- **Commit Message**: `fix: regenerate package-lock.json to remove same-runtime references`
+- **修改统计**: 2 个文件，2761 行新增，4476 行删除
 
 🎉 **修复完成！等待部署验证。**
 

@@ -7,18 +7,36 @@ import { useDocuments } from "@/contexts/DocumentContext";
 import { useRef } from "react";
 
 export default function DocumentsPage() {
-  const { documents, addDocument, deleteDocument } = useDocuments();
+  const { documents, addDocument, deleteDocument, loading, error } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach((file) => addDocument(file));
+      for (const file of Array.from(files)) {
+        try {
+          await addDocument(file);
+        } catch (err) {
+          console.error("Failed to upload file:", file.name, err);
+        }
+      }
+    }
+    // 重置 input，允许重复上传同一文件
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
   };
 
   return (
@@ -48,6 +66,13 @@ export default function DocumentsPage() {
           </Button>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <Card className="transition-all hover:shadow-lg duration-300">
@@ -59,7 +84,7 @@ export default function DocumentsPage() {
           <Card className="transition-all hover:shadow-lg duration-300">
             <CardContent className="pt-6">
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {documents.reduce((acc, doc) => acc + parseFloat(doc.size), 0).toFixed(2)}
+                {(documents.reduce((acc, doc) => acc + doc.file_size, 0) / (1024 * 1024)).toFixed(2)}
               </div>
               <div className="text-sm text-gray-600">Total Size (MB)</div>
             </CardContent>
@@ -67,7 +92,7 @@ export default function DocumentsPage() {
           <Card className="transition-all hover:shadow-lg duration-300">
             <CardContent className="pt-6">
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {documents.length > 0 ? new Date(Math.max(...documents.map(d => new Date(d.uploadDate).getTime()))).toLocaleDateString() : 'N/A'}
+                {documents.length > 0 ? new Date(Math.max(...documents.map(d => new Date(d.upload_date).getTime()))).toLocaleDateString() : 'N/A'}
               </div>
               <div className="text-sm text-gray-600">Last Upload</div>
             </CardContent>
@@ -92,6 +117,11 @@ export default function DocumentsPage() {
                   Upload Document
                 </Button>
               </div>
+            ) : loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-sm text-gray-600">Loading documents...</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 {documents.map((doc) => (
@@ -106,9 +136,15 @@ export default function DocumentsPage() {
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">{doc.name}</h4>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span>{doc.size}</span>
+                          <span>{formatFileSize(doc.file_size)}</span>
                           <span>•</span>
-                          <span>{new Date(doc.uploadDate).toLocaleDateString()}</span>
+                          <span>{new Date(doc.upload_date).toLocaleDateString()}</span>
+                          {doc.file_type && (
+                            <>
+                              <span>•</span>
+                              <span>{doc.file_type.split('/').pop()?.toUpperCase()}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -121,6 +157,7 @@ export default function DocumentsPage() {
                         size="sm"
                         className="text-gray-600 hover:text-red-600"
                         onClick={() => deleteDocument(doc.id)}
+                        disabled={loading}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

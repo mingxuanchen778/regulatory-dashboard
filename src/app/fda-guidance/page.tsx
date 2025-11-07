@@ -35,6 +35,166 @@ interface GuidanceDocument {
   icon: "edit" | "file" | "heart";
 }
 
+// 模拟文档数据（移到组件外部以避免 React Hook 依赖警告）
+const ALL_DOCUMENTS: GuidanceDocument[] = [
+  {
+    id: "1",
+    title: "Oncology Therapeutic Radiopharmaceuticals: Dosage Optimization During Clinical Development",
+    description: "Draft guidance for industry on dosage optimization strategies for oncology therapeutic radiopharmaceuticals during clinical development",
+    date: "2025/8/18",
+    organization: "Oncology Center of Excellence",
+    size: "362.51 KB",
+    status: "Draft",
+    topics: ["Clinical - Medical", "Oncology"],
+    commentPeriodCloses: "2025/11/18",
+    icon: "edit"
+  },
+  {
+    id: "2",
+    title: "Artificial Intelligence and Machine Learning (AI/ML)-Enabled Medical Devices",
+    description: "Marketing submission recommendations for AI/ML-enabled medical devices",
+    date: "2024/10/15",
+    organization: "Center for Devices and Radiological Health",
+    size: "1.23 MB",
+    status: "Final",
+    topics: ["AI/ML", "Digital Health", "Premarket"],
+    icon: "file"
+  },
+  {
+    id: "3",
+    title: "Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions",
+    description: "Draft guidance on cybersecurity considerations for medical device manufacturers",
+    date: "2024/9/29",
+    organization: "Center for Devices and Radiological Health",
+    size: "856.34 KB",
+    status: "Draft",
+    topics: ["Cybersecurity", "Quality Systems", "Premarket"],
+    commentPeriodCloses: "2024/12/29",
+    icon: "edit"
+  },
+  {
+    id: "4",
+    title: "Software as a Medical Device (SaMD): Clinical Evaluation",
+    description: "Guidance on clinical evaluation requirements for software as a medical device",
+    date: "2024/8/22",
+    organization: "Center for Devices and Radiological Health",
+    size: "678.90 KB",
+    status: "Final",
+    topics: ["Software", "Digital Health", "Clinical - Medical"],
+    icon: "file"
+  },
+  {
+    id: "5",
+    title: "Decentralized Clinical Trials for Drugs, Biological Products, and Devices",
+    description: "Guidance on conducting decentralized clinical trials",
+    date: "2024/7/10",
+    organization: "Center for Drug Evaluation and Research",
+    size: "945.12 KB",
+    status: "Final",
+    topics: ["Clinical Trials", "Clinical - Medical"],
+    icon: "file"
+  },
+  {
+    id: "6",
+    title: "Biosimilar Product Development: Chemistry, Manufacturing, and Controls",
+    description: "Guidance on CMC considerations for biosimilar product development",
+    date: "2024/6/18",
+    organization: "Center for Biologics Evaluation and Research",
+    size: "1.45 MB",
+    status: "Final",
+    topics: ["Biosimilars", "Manufacturing"],
+    icon: "file"
+  },
+  {
+    id: "7",
+    title: "Generic Drug User Fee Amendments (GDUFA): Regulatory Science Initiatives",
+    description: "Overview of GDUFA regulatory science initiatives",
+    date: "2024/5/25",
+    organization: "Center for Drug Evaluation and Research",
+    size: "523.67 KB",
+    status: "Final",
+    topics: ["Generic Drugs", "ANDA"],
+    icon: "file"
+  },
+  {
+    id: "8",
+    title: "Investigational New Drug Applications: Determining Whether Human Research Studies Can Be Conducted Without an IND",
+    description: "Guidance on when an IND application is required for human research studies",
+    date: "2024/4/30",
+    organization: "Center for Drug Evaluation and Research",
+    size: "789.23 KB",
+    status: "Final",
+    topics: ["IND", "Clinical Trials"],
+    icon: "file"
+  },
+  {
+    id: "9",
+    title: "Biologics License Applications: Chemistry, Manufacturing, and Controls Information",
+    description: "Guidance on CMC information requirements for BLA submissions",
+    date: "2024/3/15",
+    organization: "Center for Biologics Evaluation and Research",
+    size: "1.12 MB",
+    status: "Final",
+    topics: ["BLA", "Manufacturing"],
+    icon: "file"
+  },
+  {
+    id: "10",
+    title: "Oncology Drug Development: Considerations for Accelerated Approval",
+    description: "Guidance on accelerated approval pathways for oncology drugs",
+    date: "2024/2/20",
+    organization: "Oncology Center of Excellence",
+    size: "834.56 KB",
+    status: "Final",
+    topics: ["Oncology", "Product Development"],
+    icon: "heart"
+  },
+  {
+    id: "11",
+    title: "Administrative Procedures: Meetings with FDA Staff",
+    description: "Guidance on requesting and conducting meetings with FDA staff",
+    date: "2024/1/10",
+    organization: "Office of the Commissioner",
+    size: "456.78 KB",
+    status: "Final",
+    topics: ["Administrative / Procedural"],
+    icon: "file"
+  },
+  {
+    id: "12",
+    title: "Women's Health Research: Considerations for Clinical Trials",
+    description: "Guidance on including women in clinical trials and analyzing sex differences",
+    date: "2023/12/5",
+    organization: "Office of Women's Health",
+    size: "712.34 KB",
+    status: "Final",
+    topics: ["Clinical Trials", "Clinical - Medical"],
+    icon: "heart"
+  },
+  {
+    id: "13",
+    title: "ICH E6(R3) Good Clinical Practice: Integrated Addendum",
+    description: "ICH guidance on good clinical practice standards",
+    date: "2023/11/15",
+    organization: "Center for Drug Evaluation and Research",
+    size: "1.67 MB",
+    status: "Final",
+    topics: ["ICH-Efficacy", "Clinical Trials"],
+    icon: "file"
+  },
+  {
+    id: "14",
+    title: "Design Controls for Medical Devices",
+    description: "Guidance on design control requirements for medical device development",
+    date: "2024/6/12",
+    organization: "Center for Devices and Radiological Health",
+    size: "567.89 KB",
+    status: "Final",
+    topics: ["Design Controls", "Premarket"],
+    icon: "file"
+  }
+];
+
 export default function FDAGuidancePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
@@ -80,146 +240,10 @@ export default function FDAGuidancePage() {
     "Product Development"
   ];
 
-  const allDocuments: GuidanceDocument[] = [
-    {
-      id: "1",
-      title: "Oncology Therapeutic Radiopharmaceuticals: Dosage Optimization During Clinical Development",
-      description: "Draft guidance for industry on dosage optimization strategies for oncology therapeutic radiopharmaceuticals during clinical development",
-      date: "2025/8/18",
-      organization: "Oncology Center of Excellence",
-      size: "362.51 KB",
-      status: "Draft",
-      topics: ["Clinical - Medical", "Oncology"],
-      commentPeriodCloses: "2025/11/18",
-      icon: "edit"
-    },
-    {
-      id: "2",
-      title: "Marketing Submission Recommendations for a Predetermined Change Control Plan for Artificial Intelligence-Enabled Device Software Functions",
-      description: "Final guidance for industry and FDA staff on marketing submission recommendations for predetermined change control plans for AI-enabled device software functions",
-      date: "2025/5/17",
-      organization: "Center for Devices and Radiological Health",
-      size: "650.58 KB",
-      status: "Final",
-      topics: ["Premarket", "Digital Health"],
-      icon: "heart"
-    },
-    {
-      id: "3",
-      title: "E21 Inclusion of Pregnant and Breastfeeding Women in Clinical Trials",
-      description: "Draft ICH guidance for industry on the inclusion of pregnant and breastfeeding women in clinical trials",
-      date: "2025/7/20",
-      organization: "Center for Biologics Evaluation and Research",
-      size: "429.62 KB",
-      status: "Draft",
-      topics: ["ICH-Efficacy"],
-      commentPeriodCloses: "2025/10/20",
-      icon: "edit"
-    },
-    {
-      id: "4",
-      title: "Formal Meetings Between the FDA and Sponsors or Applicants of BsUFA Products",
-      description: "Final guidance for industry on formal meetings between FDA and sponsors or applicants of BsUFA products",
-      date: "2025/7/17",
-      organization: "Center for Drug Evaluation and Research",
-      size: "358.01 KB",
-      status: "Final",
-      topics: ["Administrative / Procedural", "Biosimilars"],
-      icon: "heart"
-    },
-    {
-      id: "5",
-      title: "Development of Cancer Drugs for Use in Novel Combination - Determining the Contribution of the Individual Drugs' Effects",
-      description: "Guidance on Abbreviated New Drug Application for generic drug approval",
-      date: "2023/3/9",
-      organization: "Center for Drug Evaluation and Research",
-      size: "445.23 KB",
-      status: "Final",
-      topics: ["ANDA", "Generic Drugs"],
-      icon: "file"
-    },
-    {
-      id: "6",
-      title: "Investigational New Drug (IND) Application",
-      description: "Guidance on IND application requirements for clinical studies",
-      date: "2023/1/24",
-      organization: "Center for Drug Evaluation and Research",
-      size: "512.34 KB",
-      status: "Final",
-      topics: ["IND", "Clinical Trials"],
-      icon: "file"
-    },
-    {
-      id: "7",
-      title: "Biologics License Application (BLA) Process",
-      description: "Guidance on Biologics License Application submission requirements and process",
-      date: "2023/2/14",
-      organization: "Center for Biologics Evaluation and Research",
-      size: "678.90 KB",
-      status: "Final",
-      topics: ["BLA", "Biologics Approval"],
-      icon: "heart"
-    },
-    {
-      id: "8",
-      title: "Biosimilar Product Development",
-      description: "Guidance on biosimilar product development and approval pathway",
-      date: "2023/4/11",
-      organization: "Center for Drug Evaluation and Research",
-      size: "523.45 KB",
-      status: "Final",
-      topics: ["Biosimilars", "Product Development"],
-      icon: "heart"
-    },
-    {
-      id: "9",
-      title: "Cybersecurity in Medical Devices",
-      description: "Final guidance on cybersecurity for networked medical devices",
-      date: "2024/10/15",
-      organization: "Center for Devices and Radiological Health",
-      size: "890.12 KB",
-      status: "Final",
-      topics: ["Cybersecurity", "Software"],
-      icon: "file"
-    },
-    {
-      id: "10",
-      title: "AI/ML-Based Software as a Medical Device",
-      description: "Draft guidance on artificial intelligence and machine learning in medical devices",
-      date: "2024/12/20",
-      organization: "Center for Devices and Radiological Health",
-      size: "734.56 KB",
-      status: "Draft",
-      topics: ["AI/ML", "Software", "Digital Health"],
-      commentPeriodCloses: "2025/3/20",
-      icon: "edit"
-    },
-    {
-      id: "11",
-      title: "Quality Systems for Medical Device Manufacturing",
-      description: "Guidance on quality management systems for medical device manufacturers",
-      date: "2024/8/5",
-      organization: "Center for Devices and Radiological Health",
-      size: "612.34 KB",
-      status: "Final",
-      topics: ["Quality Systems", "Manufacturing"],
-      icon: "file"
-    },
-    {
-      id: "12",
-      title: "Design Controls for Medical Devices",
-      description: "Guidance on design control requirements for medical device development",
-      date: "2024/6/12",
-      organization: "Center for Devices and Radiological Health",
-      size: "567.89 KB",
-      status: "Final",
-      topics: ["Design Controls", "Premarket"],
-      icon: "file"
-    }
-  ];
+  // 使用组件外部定义的常量数据
 
   const filteredDocuments = useMemo(() => {
-    return allDocuments.filter(doc => {
+    return ALL_DOCUMENTS.filter(doc => {
       const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            doc.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = selectedStatus === "All Statuses" || doc.status === selectedStatus;

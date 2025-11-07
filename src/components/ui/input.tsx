@@ -13,8 +13,7 @@ import { cn } from "@/lib/utils";
  * Input 组件属性接口
  * 继承所有原生 input HTML 属性
  */
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 /**
  * Input 组件

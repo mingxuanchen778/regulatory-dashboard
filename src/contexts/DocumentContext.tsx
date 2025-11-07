@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { getSupabase } from "@/lib/supabase";
 
 export interface Document {
@@ -33,11 +33,7 @@ export function DocumentProvider({ children }: { children: ReactNode }) {
 
 
   // 从 Supabase 加载文档列表
-  useEffect(() => {
-    loadDocuments();
-  }, []);
-
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -56,7 +52,11 @@ export function DocumentProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
 
   const addDocument = async (file: File) => {
     try {

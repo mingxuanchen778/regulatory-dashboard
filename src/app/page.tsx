@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Bookmark, Compass, BookOpen, FileCheck, MessageSquare, TrendingUp, Bell, Upload } from "lucide-react";
 import { useDocuments } from "@/contexts/DocumentContext";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { GlobalTemplatesModal } from "@/components/GlobalTemplatesModal";
 
 export default function Home() {
   const { documents, addDocument } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 全局模板库模态对话框状态
+  const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -132,7 +136,12 @@ export default function Home() {
             <CardContent>
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <Badge variant="outline" className="text-green-700 border-green-300 text-xs">📄 200+ TEMPLATES</Badge>
-                <a href="#" className="text-sm text-green-700 hover:underline">Browse Templates</a>
+                <button
+                  onClick={() => setIsTemplatesModalOpen(true)}
+                  className="text-sm text-green-700 hover:underline"
+                >
+                  Browse Templates
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -251,6 +260,12 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 全局模板库模态对话框 */}
+      <GlobalTemplatesModal
+        open={isTemplatesModalOpen}
+        onOpenChange={setIsTemplatesModalOpen}
+      />
     </div>
   );
 }

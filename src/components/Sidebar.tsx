@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { FileText, Bookmark, Bell, MessageSquare, Menu, X, LucideIcon } from "lucide-react";
+import { FileText, Bookmark, Bell, MessageSquare, Menu, X, Activity, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type NavigationItem = {
@@ -56,15 +56,17 @@ export function Sidebar() {
         )}
       >
         <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">R</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            {/* Logo图标 - 医疗心电图风格 */}
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+              <Activity className="w-6 h-6 text-white" />
             </div>
+            {/* 品牌名称 */}
             <div>
-              <h1 className="font-bold text-gray-900">Regulatory</h1>
-              <p className="text-sm text-gray-600">Navigator</p>
+              <h1 className="font-bold text-gray-900 text-lg tracking-tight">mycq.ai</h1>
+              <p className="text-xs text-blue-600 font-medium">Regulatory Intelligence</p>
             </div>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 p-4 overflow-y-auto">

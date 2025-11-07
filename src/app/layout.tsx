@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Regulatory Navigator",
-  description: "Your regulatory compliance dashboard",
+  title: "mycq.ai - Regulatory Intelligence",
+  description: "AI-powered regulatory compliance platform for FDA and global markets",
 };
 
 export const viewport: Viewport = {

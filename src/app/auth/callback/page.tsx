@@ -37,6 +37,28 @@ export default function AuthCallbackPage() {
   const [countdown, setCountdown] = useState(3);
 
   // ============================================================
+  // 倒计时重定向
+  // ============================================================
+
+  const startCountdown = useCallback(() => {
+    let count = 3;
+    setCountdown(count);
+
+    const timer = setInterval(() => {
+      count -= 1;
+      setCountdown(count);
+
+      if (count <= 0) {
+        clearInterval(timer);
+        router.push("/login");
+      }
+    }, 1000);
+
+    // 清理定时器
+    return () => clearInterval(timer);
+  }, [router]);
+
+  // ============================================================
   // OAuth 回调处理
   // ============================================================
 
@@ -83,28 +105,6 @@ export default function AuthCallbackPage() {
 
     handleOAuthCallback();
   }, [searchParams, supabase, router, startCountdown]);
-
-  // ============================================================
-  // 倒计时重定向
-  // ============================================================
-
-  const startCountdown = useCallback(() => {
-    let count = 3;
-    setCountdown(count);
-
-    const timer = setInterval(() => {
-      count -= 1;
-      setCountdown(count);
-
-      if (count <= 0) {
-        clearInterval(timer);
-        router.push("/login");
-      }
-    }, 1000);
-
-    // 清理定时器
-    return () => clearInterval(timer);
-  }, [router]);
 
   // ============================================================
   // 渲染

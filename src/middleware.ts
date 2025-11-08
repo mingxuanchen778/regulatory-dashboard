@@ -23,7 +23,6 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSupabase } from "@/lib/supabase";
 
 // ============================================================
 // 公共路由配置
@@ -76,57 +75,8 @@ export async function middleware(request: NextRequest) {
     console.log(`[Middleware] Processing: ${pathname}`);
   }
 
-  try {
-    // ============================================================
-    // 1. 获取 Supabase 客户端并检查会话
-    // ============================================================
-
-    const supabase = getSupabase();
-    const { data: { session }, error } = await supabase.auth.getSession();
-
-    if (error) {
-      console.error("[Middleware] Error getting session:", error);
-      // 错误时默认允许请求继续，避免阻塞
-      return NextResponse.next();
-    }
-
-    const isLoggedIn = session !== null;
-
-    // 调试日志
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[Middleware] User logged in: ${isLoggedIn}`);
-    }
-
-    // ============================================================
-    // 2. 路由保护逻辑
-    // ============================================================
-
-    // 情况 1：已登录用户访问认证页面（登录/注册）→ 重定向到首页
-    if (isLoggedIn && isAuthRoute(pathname)) {
-      console.log(`[Middleware] Logged in user accessing auth route, redirecting to /`);
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
-    }
-
-    // 情况 2：未登录用户访问受保护路由 → 重定向到登录页
-    if (!isLoggedIn && !isPublicRoute(pathname)) {
-      console.log(`[Middleware] Unauthenticated user accessing protected route, redirecting to /login`);
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      // 保存原始路径，登录后可以重定向回来（可选）
-      url.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(url);
-    }
-
-    // 情况 3：其他情况 → 允许请求继续
-    return NextResponse.next();
-  } catch (error) {
-    // 捕获所有未预期的错误
-    console.error("[Middleware] Unexpected error:", error);
-    // 错误时默认允许请求继续，避免阻塞
-    return NextResponse.next();
-  }
+  // 最小变更：暂不在 Edge Runtime 进行会话检查与重定向，直接放行
+  return NextResponse.next();
 }
 
 // ============================================================

@@ -2,7 +2,7 @@
 
 /**
  * 邮箱验证和密码重置确认页面
- * 
+ *
  * 功能：
  * - 处理邮箱验证回调（type=email）
  * - 处理密码重置回调（type=recovery）
@@ -14,7 +14,7 @@
  * - 验证失败时显示错误信息
  */
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
@@ -23,7 +23,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 
 type VerificationStatus = "loading" | "success" | "error";
 
-export default function ConfirmPage() {
+function ConfirmPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = getSupabase();
@@ -60,7 +60,7 @@ export default function ConfirmPage() {
         if (error) {
           console.error("Verification error:", error);
           setStatus("error");
-          
+
           // 根据错误类型提供友好的错误消息
           if (error.message.includes("expired")) {
             setErrorMessage("验证链接已过期，请重新发送验证邮件");
@@ -187,3 +187,12 @@ export default function ConfirmPage() {
   );
 }
 
+
+
+export default function ConfirmPage() {
+  return (
+    <Suspense fallback={<div>正在验证...</div>}>
+      <ConfirmPageInner />
+    </Suspense>
+  );
+}

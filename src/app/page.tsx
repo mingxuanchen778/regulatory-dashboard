@@ -7,10 +7,19 @@ import { FileText, Bookmark, Compass, BookOpen, FileCheck, MessageSquare, Trendi
 import { useDocuments } from "@/contexts/DocumentContext";
 import { useRef, useState } from "react";
 import { GlobalTemplatesModal } from "@/components/GlobalTemplatesModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
   const { documents, addDocument } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 获取认证状态和用户信息
+  const { user, loading } = useAuth();
+
+  // 计算显示名称：优先使用 full_name，其次使用 email 前缀，最后使用 "用户"
+  const displayName = user?.user_metadata?.full_name ||
+                      user?.email?.split('@')[0] ||
+                      "用户";
 
   // 全局模板库模态对话框状态
   const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
@@ -38,9 +47,19 @@ export default function Home() {
       />
 
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Header */}
+        {/* Header - 动态显示用户欢迎语 */}
         <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Welcome back, Nick</h1>
+          {loading ? (
+            // 加载状态：显示占位符动画
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              Welcome back, <span className="inline-block w-20 h-7 bg-gray-300 rounded animate-pulse align-middle"></span>
+            </h1>
+          ) : (
+            // 已加载：显示真实用户名
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              Welcome back, {displayName}
+            </h1>
+          )}
           <p className="text-sm sm:text-base text-gray-600">Your regulatory compliance dashboard - Navigate with confidence</p>
         </div>
 

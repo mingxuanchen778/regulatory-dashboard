@@ -5,6 +5,7 @@ import ClientBody from "./ClientBody";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import { DocumentProvider } from "@/contexts/DocumentContext";
 import { BookmarkProvider } from "@/contexts/BookmarkContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,13 +37,16 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body suppressHydrationWarning className="antialiased">
         <ClientBody>
-          <DocumentProvider>
-            <BookmarkProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-            </BookmarkProvider>
-          </DocumentProvider>
+          {/* AuthProvider: 提供全局认证状态和方法 */}
+          <AuthProvider>
+            <DocumentProvider>
+              <BookmarkProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+              </BookmarkProvider>
+            </DocumentProvider>
+          </AuthProvider>
         </ClientBody>
       </body>
     </html>

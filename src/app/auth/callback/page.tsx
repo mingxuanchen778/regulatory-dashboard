@@ -17,7 +17,7 @@
  * 4. 失败：显示错误，3 秒后返回登录页
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,13 +82,13 @@ export default function AuthCallbackPage() {
     };
 
     handleOAuthCallback();
-  }, [searchParams, supabase, router]);
+  }, [searchParams, supabase, router, startCountdown]);
 
   // ============================================================
   // 倒计时重定向
   // ============================================================
 
-  const startCountdown = () => {
+  const startCountdown = useCallback(() => {
     let count = 3;
     setCountdown(count);
 
@@ -104,7 +104,7 @@ export default function AuthCallbackPage() {
 
     // 清理定时器
     return () => clearInterval(timer);
-  };
+  }, [router]);
 
   // ============================================================
   // 渲染

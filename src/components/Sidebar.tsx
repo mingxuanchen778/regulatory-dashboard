@@ -174,9 +174,18 @@ export function Sidebar() {
               </Button>
             </>
           ) : (
-            // 未登录：显示占位符（理论上不会出现，因为 middleware 会重定向）
-            <div className="text-center text-sm text-gray-500">
-              未登录
+            // 未登录：显示登录和注册按钮
+            <div className="space-y-2">
+              <Link href="/login" className="block">
+                <Button variant="default" className="w-full text-sm">
+                  登录
+                </Button>
+              </Link>
+              <Link href="/signup" className="block">
+                <Button variant="outline" className="w-full text-sm">
+                  注册
+                </Button>
+              </Link>
             </div>
           )}
         </div>

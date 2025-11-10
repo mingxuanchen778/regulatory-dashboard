@@ -51,44 +51,44 @@ export default function SignupPage() {
     clearError();
     setFormError(null);
 
-    // 验证全名
+    // Validate full name
     if (!fullName.trim()) {
-      setFormError("请输入您的全名");
+      setFormError("Please enter your full name");
       return false;
     }
     if (fullName.trim().length < 2) {
-      setFormError("全名至少需要 2 个字符");
+      setFormError("Full name must be at least 2 characters");
       return false;
     }
 
-    // 验证邮箱
+    // Validate email
     if (!email) {
-      setFormError("请输入邮箱地址");
+      setFormError("Please enter your email address");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setFormError("请输入有效的邮箱地址");
+      setFormError("Please enter a valid email address");
       return false;
     }
 
-    // 验证密码
+    // Validate password
     if (!password) {
-      setFormError("请输入密码");
+      setFormError("Please enter a password");
       return false;
     }
     if (password.length < 6) {
-      setFormError("密码至少需要 6 位字符");
+      setFormError("Password must be at least 6 characters");
       return false;
     }
 
-    // 验证确认密码
+    // Validate confirm password
     if (!confirmPassword) {
-      setFormError("请确认密码");
+      setFormError("Please confirm your password");
       return false;
     }
     if (password !== confirmPassword) {
-      setFormError("两次输入的密码不一致");
+      setFormError("Passwords do not match");
       return false;
     }
 
@@ -108,25 +108,25 @@ export default function SignupPage() {
 
     try {
       setIsLoading(true);
-      // 调用 AuthContext 的 signUp 方法，传入 email、password 和 fullName
+      // Call AuthContext's signUp method, passing email, password, and fullName
       await signUp(email, password, fullName);
 
-      // 注册成功提示
-      // 注意：如果 Supabase 启用了邮箱验证，用户需要先验证邮箱才能登录
-      // AuthContext 会在 error 状态中显示 "注册成功！请检查您的邮箱以完成验证。"
-      // 如果没有启用邮箱验证，则会自动登录并重定向到首页
+      // Sign up success message
+      // Note: If Supabase has email verification enabled, users need to verify their email before logging in
+      // AuthContext will display "Sign up successful! Please check your email to complete verification." in the error state
+      // If email verification is not enabled, it will automatically log in and redirect to the homepage
 
-      // 检查是否有 error（实际上是成功提示）
-      if (error && error.includes("请检查您的邮箱")) {
-        // 邮箱验证已启用，不重定向，让用户看到提示
+      // Check if there is an error (actually a success message)
+      if (error && error.includes("Please check your email")) {
+        // Email verification is enabled, don't redirect, let user see the message
         console.log("Email verification required");
       } else {
-        // 没有启用邮箱验证，自动登录成功，重定向到首页
+        // Email verification is not enabled, auto login successful, redirect to homepage
         router.push("/");
       }
     } catch (err) {
       console.error("Signup failed:", err);
-      // 错误已由 AuthContext 处理，这里不需要额外操作
+      // Error is already handled by AuthContext, no additional action needed here
     } finally {
       setIsLoading(false);
     }

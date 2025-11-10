@@ -29,7 +29,7 @@ function AuthCallbackContent() {
   const supabase = getSupabase();
 
   // ============================================================
-  // 状态管理
+  // State Management
   // ============================================================
 
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ function AuthCallbackContent() {
   const [countdown, setCountdown] = useState(3);
 
   // ============================================================
-  // 倒计时重定向
+  // Countdown Redirect
   // ============================================================
 
   const startCountdown = useCallback(() => {
@@ -54,27 +54,27 @@ function AuthCallbackContent() {
       }
     }, 1000);
 
-    // 清理定时器
+    // Clean up timer
     return () => clearInterval(timer);
   }, [router]);
 
   // ============================================================
-  // OAuth 回调处理
+  // OAuth Callback Handler
   // ============================================================
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // 1. 从 URL 获取授权码
+        // 1. Get authorization code from URL
         const code = searchParams.get("code");
 
         if (!code) {
-          throw new Error("未找到授权码，请重新登录");
+          throw new Error("Authorization code not found, please log in again");
         }
 
         console.log("Processing OAuth callback with code:", code.substring(0, 10) + "...");
 
-        // 2. 交换授权码获取会话
+        // 2. Exchange authorization code for session
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (exchangeError) {
@@ -82,23 +82,23 @@ function AuthCallbackContent() {
         }
 
         if (!data.session) {
-          throw new Error("无法创建会话，请重新登录");
+          throw new Error("Unable to create session, please log in again");
         }
 
         console.log("OAuth login successful:", data.user?.email);
 
-        // 3. 成功：重定向到首页
+        // 3. Success: redirect to homepage
         setLoading(false);
         router.push("/");
       } catch (err) {
-        // 4. 失败：显示错误并启动倒计时
+        // 4. Failure: show error and start countdown
         console.error("OAuth callback error:", err);
 
-        const errorMessage = err instanceof Error ? err.message : "登录验证失败";
+        const errorMessage = err instanceof Error ? err.message : "Login verification failed";
         setError(errorMessage);
         setLoading(false);
 
-        // 启动倒计时重定向
+        // Start countdown redirect
         startCountdown();
       }
     };
@@ -107,14 +107,14 @@ function AuthCallbackContent() {
   }, [searchParams, supabase, router, startCountdown]);
 
   // ============================================================
-  // 渲染
+  // Render
   // ============================================================
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          {/* Logo 和品牌 */}
+          {/* Logo and Brand */}
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-2xl font-bold text-white">M</span>
@@ -122,25 +122,25 @@ function AuthCallbackContent() {
           </div>
 
           <CardTitle className="text-2xl font-bold">
-            {loading ? "验证登录" : error ? "登录失败" : "登录成功"}
+            {loading ? "Verifying Login" : error ? "Login Failed" : "Login Successful"}
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* 加载状态 */}
+          {/* Loading State */}
           {loading && (
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
               <p className="text-gray-600 text-center">
-                正在验证登录...
+                Verifying login...
               </p>
               <p className="text-sm text-gray-500 text-center">
-                请稍候，我们正在处理您的登录请求
+                Please wait, we are processing your login request
               </p>
             </div>
           )}
 
-          {/* 错误状态 */}
+          {/* Error State */}
           {!loading && error && (
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
@@ -148,24 +148,24 @@ function AuthCallbackContent() {
               </div>
 
               <div className="text-center space-y-2">
-                <p className="text-gray-900 font-medium">登录验证失败</p>
+                <p className="text-gray-900 font-medium">Login Verification Failed</p>
                 <p className="text-sm text-gray-600">{error}</p>
               </div>
 
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center w-full">
-                {countdown} 秒后自动返回登录页...
+                Redirecting to login page in {countdown} seconds...
               </div>
 
               <button
                 onClick={() => router.push("/login")}
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
               >
-                立即返回登录页
+                Return to Login Page Now
               </button>
             </div>
           )}
 
-          {/* 成功状态（可选，通常会立即跳转） */}
+          {/* Success State (optional, usually redirects immediately) */}
           {!loading && !error && (
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -173,8 +173,8 @@ function AuthCallbackContent() {
               </div>
 
               <div className="text-center space-y-2">
-                <p className="text-gray-900 font-medium">登录成功！</p>
-                <p className="text-sm text-gray-600">正在跳转到首页...</p>
+                <p className="text-gray-900 font-medium">Login Successful!</p>
+                <p className="text-sm text-gray-600">Redirecting to homepage...</p>
               </div>
             </div>
           )}
@@ -196,12 +196,12 @@ function LoadingFallback() {
               <span className="text-2xl font-bold text-white">M</span>
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">验证登录</CardTitle>
+          <CardTitle className="text-2xl font-bold">Verifying Login</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-            <p className="text-gray-600 text-center">正在验证登录...</p>
+            <p className="text-gray-600 text-center">Verifying login...</p>
           </div>
         </CardContent>
       </Card>

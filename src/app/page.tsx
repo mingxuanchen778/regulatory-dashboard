@@ -13,15 +13,15 @@ export default function Home() {
   const { documents, addDocument } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 获取认证状态和用户信息
+  // Get authentication status and user information
   const { user, loading } = useAuth();
 
-  // 计算显示名称：优先使用 full_name，其次使用 email 前缀，最后使用 "用户"
+  // Calculate display name: prioritize full_name, then email prefix, finally "Guest"
   const displayName = user?.user_metadata?.full_name ||
                       user?.email?.split('@')[0] ||
-                      "用户";
+                      "Guest";
 
-  // 全局模板库模态对话框状态
+  // Global templates modal dialog state
   const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,15 +47,15 @@ export default function Home() {
       />
 
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Header - 动态显示用户欢迎语 */}
+        {/* Header - Dynamic user welcome message */}
         <div className="mb-6 lg:mb-8">
           {loading ? (
-            // 加载状态：显示占位符动画
+            // Loading state: show placeholder animation
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Welcome back, <span className="inline-block w-20 h-7 bg-gray-300 rounded animate-pulse align-middle"></span>
             </h1>
           ) : (
-            // 已加载：显示真实用户名
+            // Loaded: show real username
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {displayName}
             </h1>

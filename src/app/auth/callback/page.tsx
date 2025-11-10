@@ -65,33 +65,99 @@ function AuthCallbackContent() {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // 1. Get authorization code from URL
-        const code = searchParams.get("code");
+        // 详细日志：记录完整的 URL 信息
+        const fullUrl = window.location.href;
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
 
-        if (!code) {
-          throw new Error("Authorization code not found, please log in again");
+        console.log("=== OAuth Callback Debug Info ===");
+        console.log("Full URL:", fullUrl);
+        console.log("Search params:", Object.fromEntries(urlParams.entries()));
+        console.log("Hash params:", Object.fromEntries(hashParams.entries()));
+        console.log("================================");
+
+        // 检查是否是 Implicit Flow（返回 access_token）
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+
+        if (accessToken && refreshToken) {
+          // Implicit Flow: 直接使用 access_token 和 refresh_token
+          console.log("Detected Implicit Flow (access_token found)");
+          console.log("Setting session with tokens...");
+
+          const { data, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (sessionError) {
+            console.error("Session error:", sessionError);
+            throw sessionError;
+          }
+
+          if (!data.session) {
+            throw new Error("Unable to create session from tokens");
+          }
+
+          console.log("OAuth login successful (Implicit Flow):", data.user?.email);
+
+          // Success: redirect to homepage
+          setLoading(false);
+          router.push("/");
+          return;
         }
 
+        // PKCE Flow: 查找 authorization code
+        let code = searchParams.get("code");
+
+        // 如果查询参数中没有 code，尝试从 hash fragment 中获取
+        if (!code) {
+          code = hashParams.get("code");
+          console.log("Code from hash:", code ? code.substring(0, 10) + "..." : "null");
+        } else {
+          console.log("Code from query:", code.substring(0, 10) + "...");
+        }
+
+        if (!code) {
+          // 既没有 access_token 也没有 code
+          const errorDetails = {
+            url: fullUrl,
+            hasQueryParams: urlParams.toString().length > 0,
+            hasHashParams: hashParams.toString().length > 0,
+            queryParamKeys: Array.from(urlParams.keys()),
+            hashParamKeys: Array.from(hashParams.keys()),
+          };
+
+          console.error("Neither authorization code nor access token found. Details:", errorDetails);
+
+          throw new Error(
+            "OAuth callback failed: No authorization code or access token found. " +
+            "Please try logging in again."
+          );
+        }
+
+        console.log("Detected PKCE Flow (code found)");
         console.log("Processing OAuth callback with code:", code.substring(0, 10) + "...");
 
-        // 2. Exchange authorization code for session
+        // PKCE Flow: Exchange authorization code for session
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (exchangeError) {
+          console.error("Exchange error:", exchangeError);
           throw exchangeError;
         }
 
         if (!data.session) {
-          throw new Error("Unable to create session, please log in again");
+          throw new Error("Unable to create session from code");
         }
 
-        console.log("OAuth login successful:", data.user?.email);
+        console.log("OAuth login successful (PKCE Flow):", data.user?.email);
 
-        // 3. Success: redirect to homepage
+        // Success: redirect to homepage
         setLoading(false);
         router.push("/");
       } catch (err) {
-        // 4. Failure: show error and start countdown
+        // Failure: show error and start countdown
         console.error("OAuth callback error:", err);
 
         const errorMessage = err instanceof Error ? err.message : "Login verification failed";

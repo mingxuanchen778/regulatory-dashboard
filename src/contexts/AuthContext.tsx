@@ -131,6 +131,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         options: {
           scopes: 'email profile openid',
           redirectTo: `${window.location.origin}/auth/callback`,
+          // 注意：不设置 flowType，让 Supabase 使用默认流程
+          // 当前 callback 页面已支持 Implicit Flow 和 PKCE Flow
         },
       });
 
@@ -158,6 +160,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          // 注意：不设置 flowType，让 Supabase 使用默认流程
+          // 当前 callback 页面已支持 Implicit Flow 和 PKCE Flow
         },
       });
 

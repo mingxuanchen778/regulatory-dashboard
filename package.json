@@ -10,7 +10,8 @@
     "lint": "bunx tsc --noEmit && next lint",
     "format": "bunx biome format --write",
     "bulk-upload": "node scripts/bulk-upload.js",
-    "bulk-upload:test": "SOURCE_DIR=./test-documents CONCURRENCY=5 node scripts/bulk-upload.js"
+    "bulk-upload:test": "SOURCE_DIR=./test-documents CONCURRENCY=5 node scripts/bulk-upload.js",
+    "check-oauth": "node scripts/check-oauth-config.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -34,6 +35,7 @@
     "@types/node": "^20.17.50",
     "@types/react": "^18.3.22",
     "@types/react-dom": "^18.3.7",
+    "dotenv": "^17.2.3",
     "eslint": "^9.27.0",
     "eslint-config-next": "15.1.7",
     "postcss": "^8.5.3",

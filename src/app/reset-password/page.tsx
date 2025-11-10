@@ -1,18 +1,18 @@
 "use client";
 
 /**
- * 密码重置页面
- * 
- * 功能：
- * - 用户从邮件点击重置链接后到达此页面
- * - 显示设置新密码的表单（Password 和 Confirm Password）
- * - 调用 updatePassword(newPassword) 更新密码
- * - 密码更新成功后重定向到登录页
- * - 显示成功提示："密码已重置，请使用新密码登录"
- * 
- * 表单验证规则：
- * - Password：必填，至少 6 位字符
- * - Confirm Password：必填，必须与 Password 完全一致
+ * Password Reset Page
+ *
+ * Features:
+ * - User arrives at this page after clicking reset link in email
+ * - Displays form to set new password (Password and Confirm Password)
+ * - Calls updatePassword(newPassword) to update password
+ * - Redirects to login page after successful password update
+ * - Shows success message: "Password has been reset, please sign in with your new password"
+ *
+ * Form Validation Rules:
+ * - Password: Required, at least 6 characters
+ * - Confirm Password: Required, must match Password exactly
  */
 
 import { useState, FormEvent, useEffect } from "react";
@@ -29,7 +29,7 @@ export default function ResetPasswordPage() {
   const { updatePassword, session, error, clearError } = useAuth();
 
   // ============================================================
-  // 表单状态管理
+  // Form State Management
   // ============================================================
 
   const [password, setPassword] = useState("");
@@ -41,14 +41,14 @@ export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   // ============================================================
-  // 检查用户是否已通过验证
+  // Check if User is Authenticated
   // ============================================================
 
   useEffect(() => {
-    // 如果用户未登录或没有有效会话，重定向到登录页
+    // If user is not logged in or has no valid session, redirect to login
     if (!session) {
       console.log("No session found, redirecting to login");
-      // 给用户一些时间看到页面，然后重定向
+      // Give user some time to see the page, then redirect
       const timer = setTimeout(() => {
         router.push("/login");
       }, 2000);
@@ -57,30 +57,30 @@ export default function ResetPasswordPage() {
   }, [session, router]);
 
   // ============================================================
-  // 表单验证
+  // Form Validation
   // ============================================================
 
   const validateForm = (): boolean => {
     clearError();
     setFormError(null);
 
-    // 验证密码
+    // Validate password
     if (!password) {
-      setFormError("请输入新密码");
+      setFormError("Please enter a new password");
       return false;
     }
     if (password.length < 6) {
-      setFormError("密码至少需要 6 位字符");
+      setFormError("Password must be at least 6 characters");
       return false;
     }
 
-    // 验证确认密码
+    // Validate confirm password
     if (!confirmPassword) {
-      setFormError("请确认新密码");
+      setFormError("Please confirm your new password");
       return false;
     }
     if (password !== confirmPassword) {
-      setFormError("两次输入的密码不一致");
+      setFormError("Passwords do not match");
       return false;
     }
 
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
   };
 
   // ============================================================
-  // 更新密码
+  // Update Password
   // ============================================================
 
   const handleUpdatePassword = async (e: FormEvent<HTMLFormElement>) => {
@@ -100,27 +100,27 @@ export default function ResetPasswordPage() {
 
     try {
       setIsLoading(true);
-      // 调用 AuthContext 的 updatePassword 方法
+      // Call AuthContext's updatePassword method
       await updatePassword(password);
-      // 更新成功
+      // Update successful
       setIsSuccess(true);
-      // 3 秒后重定向到登录页
+      // Redirect to login page after 3 seconds
       setTimeout(() => {
         router.push("/login");
       }, 3000);
     } catch (err) {
       console.error("Update password failed:", err);
-      // 错误已由 AuthContext 处理，这里不需要额外操作
+      // Error is already handled by AuthContext, no additional action needed here
     } finally {
       setIsLoading(false);
     }
   };
 
   // ============================================================
-  // 渲染
+  // Render
   // ============================================================
 
-  // 如果没有会话，显示提示
+  // If no session, show message
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
@@ -131,15 +131,15 @@ export default function ResetPasswordPage() {
                 <span className="text-2xl font-bold text-white">M</span>
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">无效的访问</CardTitle>
+            <CardTitle className="text-2xl font-bold">Invalid Access</CardTitle>
             <CardDescription className="text-base">
-              请通过邮件中的重置链接访问此页面
+              Please access this page through the reset link in your email
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col items-center justify-center py-8">
               <p className="text-gray-600 text-center mb-4">
-                正在重定向到登录页...
+                Redirecting to login page...
               </p>
               <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          {/* Logo 和品牌标识 */}
+          {/* Logo and Brand */}
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-2xl font-bold text-white">M</span>
@@ -161,52 +161,52 @@ export default function ResetPasswordPage() {
           </div>
 
           <CardTitle className="text-2xl font-bold">
-            {isSuccess ? "密码已重置" : "设置新密码"}
+            {isSuccess ? "Password Reset" : "Set New Password"}
           </CardTitle>
           <CardDescription className="text-base">
             {isSuccess
-              ? "您的密码已成功重置"
-              : "请输入您的新密码"}
+              ? "Your password has been successfully reset"
+              : "Please enter your new password"}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* 成功状态 */}
+          {/* Success State */}
           {isSuccess ? (
             <div className="flex flex-col items-center justify-center py-8">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <p className="text-gray-600 text-center mb-2">
-                密码已成功重置！
+                Password successfully reset!
               </p>
               <p className="text-sm text-gray-500 text-center mb-6">
-                正在跳转到登录页，请使用新密码登录...
+                Redirecting to login page, please sign in with your new password...
               </p>
               <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
           ) : (
             <>
-              {/* 错误提示 */}
+              {/* Error Message */}
               {(formError || error) && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                   {formError || error}
                 </div>
               )}
 
-              {/* 密码重置表单 */}
+              {/* Password Reset Form */}
               <form onSubmit={handleUpdatePassword} className="space-y-4">
-                {/* Password 输入框 */}
+                {/* Password Input */}
                 <div className="space-y-2">
                   <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                    新密码
+                    New Password
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="至少 6 位字符"
+                      placeholder="At least 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10"
@@ -224,17 +224,17 @@ export default function ResetPasswordPage() {
                   </div>
                 </div>
 
-                {/* Confirm Password 输入框 */}
+                {/* Confirm Password Input */}
                 <div className="space-y-2">
                   <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                    确认新密码
+                    Confirm New Password
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="再次输入新密码"
+                      placeholder="Re-enter new password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="pl-10 pr-10"
@@ -251,7 +251,7 @@ export default function ResetPasswordPage() {
                   </div>
                 </div>
 
-                {/* 重置密码按钮 */}
+                {/* Reset Password Button */}
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -260,19 +260,19 @@ export default function ResetPasswordPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      更新中...
+                      Updating...
                     </>
                   ) : (
-                    "重置密码"
+                    "Reset Password"
                   )}
                 </Button>
               </form>
 
-              {/* 返回登录链接 */}
+              {/* Back to Login Link */}
               <div className="text-center text-sm text-gray-600">
-                记起密码了？{" "}
+                Remember your password?{" "}
                 <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
-                  返回登录
+                  Back to Login
                 </Link>
               </div>
             </>

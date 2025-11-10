@@ -144,9 +144,9 @@ export default function LoginPage() {
             </div>
           </div>
           
-          <CardTitle className="text-2xl font-bold">欢迎回到 mycq.ai</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome back to mycq.ai</CardTitle>
           <CardDescription className="text-base">
-            登录您的账户以继续使用 AI 驱动的合规平台
+            Sign in to your account to continue using the AI-powered compliance platform
           </CardDescription>
         </CardHeader>
 
@@ -160,10 +160,10 @@ export default function LoginPage() {
 
           {/* Email/Password 登录表单 */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
-            {/* 邮箱输入 */}
+            {/* Email Input */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                邮箱地址
+                Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -180,10 +180,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* 密码输入 */}
+            {/* Password Input */}
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                密码
+                Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -212,17 +212,17 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* 忘记密码链接 */}
+            {/* Forgot Password Link */}
             <div className="flex justify-end">
               <Link
                 href="/forgot-password"
                 className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
               >
-                忘记密码？
+                Forgot password?
               </Link>
             </div>
 
-            {/* 登录按钮 */}
+            {/* Login Button */}
             <Button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700"
@@ -231,27 +231,27 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  登录中...
+                  Signing in...
                 </>
               ) : (
-                "登录"
+                "Sign In"
               )}
             </Button>
           </form>
 
-          {/* 分隔线 */}
+          {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">或使用以下方式登录</span>
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
             </div>
           </div>
 
-          {/* OAuth 登录按钮 */}
+          {/* OAuth Login Buttons */}
           <div className="space-y-3">
-            {/* Microsoft 登录 */}
+            {/* Microsoft Login */}
             <Button
               type="button"
               variant="outline"
@@ -266,10 +266,10 @@ export default function LoginPage() {
                 <path fill="#05a6f0" d="M1 12h10v10H1z" />
                 <path fill="#ffba08" d="M12 12h10v10H12z" />
               </svg>
-              使用 Microsoft 账户登录
+              Sign in with Microsoft
             </Button>
 
-            {/* Google 登录 */}
+            {/* Google Login */}
             <Button
               type="button"
               variant="outline"
@@ -295,15 +295,15 @@ export default function LoginPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              使用 Google 账户登录
+              Sign in with Google
             </Button>
           </div>
 
-          {/* 注册链接 */}
+          {/* Registration Link */}
           <div className="text-center text-sm text-gray-600">
-            还没有账户？{" "}
+            Don't have an account?{" "}
             <a href="/signup" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
-              立即注册
+              Sign up now
             </a>
           </div>
         </CardContent>

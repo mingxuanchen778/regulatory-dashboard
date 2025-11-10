@@ -63,21 +63,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleAuthError = (error: AuthError | Error, defaultMessage: string) => {
     console.error(defaultMessage, error);
-    
-    // 根据错误类型提供友好的错误消息
+
+    // Provide friendly error messages based on error type
     if ('status' in error) {
       switch (error.status) {
         case 400:
-          setError("请求无效，请检查输入信息");
+          setError("Invalid request, please check your input");
           break;
         case 401:
-          setError("邮箱或密码错误");
+          setError("Invalid email or password");
           break;
         case 422:
-          setError("邮箱格式不正确");
+          setError("Invalid email format");
           break;
         case 429:
-          setError("操作过于频繁，请稍后再试");
+          setError("Too many requests, please try again later");
           break;
         default:
           setError(error.message || defaultMessage);
@@ -110,8 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 状态会通过 onAuthStateChange 自动更新
       console.log("Email sign in successful:", data.user?.email);
     } catch (err) {
-      handleAuthError(err as AuthError, "登录失败");
-      throw err; // 重新抛出错误，让调用者可以处理
+      handleAuthError(err as AuthError, "Sign in failed");
+      throw err; // Re-throw error so caller can handle it
     } finally {
       setLoading(false);
     }
@@ -136,17 +136,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (signInError) throw signInError;
 
-      // OAuth 会重定向到 Microsoft 登录页面
+      // OAuth will redirect to Microsoft login page
       console.log("Redirecting to Microsoft OAuth...");
     } catch (err) {
-      handleAuthError(err as AuthError, "Microsoft 登录失败");
+      handleAuthError(err as AuthError, "Microsoft sign in failed");
       setLoading(false);
       throw err;
     }
   }, [supabase]);
 
   // ============================================================
-  // Google OAuth 登录
+  // Google OAuth Sign In
   // ============================================================
 
   const signInWithGoogle = useCallback(async () => {
@@ -163,17 +163,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (signInError) throw signInError;
 
-      // OAuth 会重定向到 Google 登录页面
+      // OAuth will redirect to Google login page
       console.log("Redirecting to Google OAuth...");
     } catch (err) {
-      handleAuthError(err as AuthError, "Google 登录失败");
+      handleAuthError(err as AuthError, "Google sign in failed");
       setLoading(false);
       throw err;
     }
   }, [supabase]);
 
   // ============================================================
-  // 邮箱注册
+  // Email Sign Up
   // ============================================================
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
@@ -185,24 +185,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
-          // 邮箱验证后重定向到 /auth/confirm 页面
+          // Redirect to /auth/confirm page after email verification
           emailRedirectTo: `${window.location.origin}/auth/confirm`,
           data: {
-            full_name: fullName || email.split('@')[0], // 默认使用邮箱前缀作为昵称
+            full_name: fullName || email.split('@')[0], // Default to email prefix as nickname
           },
         },
       });
 
       if (signUpError) throw signUpError;
 
-      // 如果启用了邮箱确认，提示用户检查邮箱
+      // If email confirmation is enabled, prompt user to check email
       if (data.user && !data.session) {
-        setError("注册成功！请检查您的邮箱以完成验证。");
+        setError("Sign up successful! Please check your email to complete verification.");
       }
 
       console.log("Sign up successful:", data.user?.email);
     } catch (err) {
-      handleAuthError(err as AuthError, "注册失败");
+      handleAuthError(err as AuthError, "Sign up failed");
       throw err;
     } finally {
       setLoading(false);
@@ -210,7 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   // ============================================================
-  // 登出
+  // Sign Out
   // ============================================================
 
   const signOut = useCallback(async () => {
@@ -222,13 +222,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (signOutError) throw signOutError;
 
-      // 清除本地状态
+      // Clear local state
       setUser(null);
       setSession(null);
 
       console.log("Sign out successful");
     } catch (err) {
-      handleAuthError(err as AuthError, "登出失败");
+      handleAuthError(err as AuthError, "Sign out failed");
       throw err;
     } finally {
       setLoading(false);
@@ -236,7 +236,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   // ============================================================
-  // 密码重置 - 发送重置邮件
+  // Password Reset - Send Reset Email
   // ============================================================
 
   const resetPassword = useCallback(async (email: string) => {
@@ -252,7 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log("Password reset email sent to:", email);
     } catch (err) {
-      handleAuthError(err as AuthError, "发送密码重置邮件失败");
+      handleAuthError(err as AuthError, "Failed to send password reset email");
       throw err;
     } finally {
       setLoading(false);
@@ -260,7 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   // ============================================================
-  // 更新密码
+  // Update Password
   // ============================================================
 
   const updatePassword = useCallback(async (newPassword: string) => {
@@ -276,7 +276,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log("Password updated successfully");
     } catch (err) {
-      handleAuthError(err as AuthError, "更新密码失败");
+      handleAuthError(err as AuthError, "Failed to update password");
       throw err;
     } finally {
       setLoading(false);

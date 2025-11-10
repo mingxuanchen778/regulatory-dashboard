@@ -174,16 +174,16 @@ export function Sidebar() {
               </Button>
             </>
           ) : (
-            // 未登录：显示登录和注册按钮
+            // Not logged in: Show login and sign up buttons
             <div className="space-y-2">
               <Link href="/login" className="block">
                 <Button variant="default" className="w-full text-sm">
-                  登录
+                  Sign In
                 </Button>
               </Link>
               <Link href="/signup" className="block">
                 <Button variant="outline" className="w-full text-sm">
-                  注册
+                  Sign Up
                 </Button>
               </Link>
             </div>

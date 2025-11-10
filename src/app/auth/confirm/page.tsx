@@ -79,20 +79,20 @@ function ConfirmPageInner() {
         // 根据验证类型重定向
         setTimeout(() => {
           if (type === "recovery") {
-            // 密码重置：重定向到密码重置页面
+            // Password reset: redirect to password reset page
             router.push("/reset-password");
           } else if (type === "email") {
-            // 邮箱验证：重定向到首页或指定页面
+            // Email verification: redirect to home or specified page
             router.push(next);
           } else {
-            // 其他类型：重定向到首页
+            // Other types: redirect to home
             router.push("/");
           }
         }, 2000);
       } catch (err) {
         console.error("Unexpected error during verification:", err);
         setStatus("error");
-        setErrorMessage("发生意外错误，请稍后再试");
+        setErrorMessage("An unexpected error occurred, please try again later");
       }
     };
 
@@ -100,14 +100,14 @@ function ConfirmPageInner() {
   }, [searchParams, supabase, router]);
 
   // ============================================================
-  // 渲染不同的状态
+  // Render Different States
   // ============================================================
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          {/* Logo 和品牌标识 */}
+          {/* Logo and Brand */}
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-2xl font-bold text-white">M</span>
@@ -115,48 +115,48 @@ function ConfirmPageInner() {
           </div>
 
           <CardTitle className="text-2xl font-bold">
-            {status === "loading" && "正在验证..."}
-            {status === "success" && "验证成功"}
-            {status === "error" && "验证失败"}
+            {status === "loading" && "Verifying..."}
+            {status === "success" && "Verification Successful"}
+            {status === "error" && "Verification Failed"}
           </CardTitle>
 
           <CardDescription className="text-base">
-            {status === "loading" && "请稍候，我们正在验证您的信息"}
-            {status === "success" && verificationType === "email" && "您的邮箱已成功验证"}
-            {status === "success" && verificationType === "recovery" && "正在跳转到密码重置页面"}
-            {status === "error" && "验证过程中出现问题"}
+            {status === "loading" && "Please wait while we verify your information"}
+            {status === "success" && verificationType === "email" && "Your email has been successfully verified"}
+            {status === "success" && verificationType === "recovery" && "Redirecting to password reset page"}
+            {status === "error" && "An error occurred during verification"}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* 加载状态 */}
+          {/* Loading State */}
           {status === "loading" && (
             <div className="flex flex-col items-center justify-center py-8">
               <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-4" />
               <p className="text-gray-600 text-center">
-                正在验证您的信息，请稍候...
+                Verifying your information, please wait...
               </p>
             </div>
           )}
 
-          {/* 成功状态 */}
+          {/* Success State */}
           {status === "success" && (
             <div className="flex flex-col items-center justify-center py-8">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <p className="text-gray-600 text-center mb-2">
-                {verificationType === "email" && "您的邮箱已成功验证！"}
-                {verificationType === "recovery" && "验证成功！正在跳转..."}
+                {verificationType === "email" && "Your email has been successfully verified!"}
+                {verificationType === "recovery" && "Verification successful! Redirecting..."}
               </p>
               <p className="text-sm text-gray-500 text-center">
-                {verificationType === "email" && "正在跳转到首页..."}
-                {verificationType === "recovery" && "请在下一页设置新密码"}
+                {verificationType === "email" && "Redirecting to home page..."}
+                {verificationType === "recovery" && "Please set your new password on the next page"}
               </p>
             </div>
           )}
 
-          {/* 错误状态 */}
+          {/* Error State */}
           {status === "error" && (
             <div className="flex flex-col items-center justify-center py-8">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -170,13 +170,13 @@ function ConfirmPageInner() {
                   onClick={() => router.push("/login")}
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  返回登录页
+                  Back to Login
                 </button>
                 <button
                   onClick={() => router.push("/signup")}
                   className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  重新注册
+                  Sign Up Again
                 </button>
               </div>
             </div>

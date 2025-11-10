@@ -181,9 +181,9 @@ export default function SignupPage() {
             </div>
           </div>
           
-          <CardTitle className="text-2xl font-bold">加入 mycq.ai</CardTitle>
+          <CardTitle className="text-2xl font-bold">Join mycq.ai</CardTitle>
           <CardDescription className="text-base">
-            创建您的账户，开始使用 AI 驱动的合规平台
+            Create your account and start using the AI-powered compliance platform
           </CardDescription>
         </CardHeader>
 
@@ -195,19 +195,19 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Email/Password 注册表单 */}
+          {/* Email/Password Sign Up Form */}
           <form onSubmit={handleEmailSignup} className="space-y-4">
-            {/* Full Name 输入框 */}
+            {/* Full Name Input */}
             <div className="space-y-2">
               <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-                全名
+                Full Name
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="您的全名"
+                  placeholder="Your full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="pl-10"
@@ -216,10 +216,10 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Email 输入框 */}
+            {/* Email Input */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                邮箱
+                Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -235,17 +235,17 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Password 输入框 */}
+            {/* Password Input */}
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                密码
+                Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="至少 6 位字符"
+                  placeholder="At least 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10"
@@ -262,17 +262,17 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Confirm Password 输入框 */}
+            {/* Confirm Password Input */}
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                确认密码
+                Confirm Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="再次输入密码"
+                  placeholder="Re-enter password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="pl-10 pr-10"
@@ -289,7 +289,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* 注册按钮 */}
+            {/* Sign Up Button */}
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -298,27 +298,27 @@ export default function SignupPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  注册中...
+                  Signing up...
                 </>
               ) : (
-                "注册"
+                "Sign Up"
               )}
             </Button>
           </form>
 
-          {/* 分隔线 */}
+          {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">或使用以下方式注册</span>
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
             </div>
           </div>
 
-          {/* OAuth 注册按钮 */}
+          {/* OAuth Sign Up Buttons */}
           <div className="space-y-2">
-            {/* Microsoft 注册按钮 */}
+            {/* Microsoft Sign Up Button */}
             <Button
               type="button"
               variant="outline"
@@ -333,10 +333,10 @@ export default function SignupPage() {
                 <path fill="#05a6f0" d="M1 12h10v10H1z" />
                 <path fill="#ffba08" d="M12 12h10v10H12z" />
               </svg>
-              使用 Microsoft 注册
+              Sign up with Microsoft
             </Button>
 
-            {/* Google 注册按钮 */}
+            {/* Google Sign Up Button */}
             <Button
               type="button"
               variant="outline"
@@ -362,15 +362,15 @@ export default function SignupPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              使用 Google 注册
+              Sign up with Google
             </Button>
           </div>
 
-          {/* 登录链接 */}
+          {/* Login Link */}
           <div className="text-center text-sm text-gray-600">
-            已有账户？{" "}
+            Already have an account?{" "}
             <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
-              登录
+              Sign in
             </Link>
           </div>
         </CardContent>

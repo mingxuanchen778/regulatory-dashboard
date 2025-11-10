@@ -96,36 +96,36 @@ export default function ForgotPasswordPage() {
           </div>
 
           <CardTitle className="text-2xl font-bold">
-            {isSuccess ? "邮件已发送" : "重置密码"}
+            {isSuccess ? "Email Sent" : "Reset Password"}
           </CardTitle>
           <CardDescription className="text-base">
             {isSuccess
-              ? "请检查您的邮箱并点击重置链接"
-              : "输入您的邮箱地址，我们将发送密码重置链接"}
+              ? "Please check your email and click the reset link"
+              : "Enter your email address and we'll send you a password reset link"}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* 成功状态 */}
+          {/* Success State */}
           {isSuccess ? (
             <div className="flex flex-col items-center justify-center py-8">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <p className="text-gray-600 text-center mb-2">
-                密码重置邮件已发送到：
+                Password reset email sent to:
               </p>
               <p className="text-gray-900 font-medium text-center mb-4">
                 {email}
               </p>
               <p className="text-sm text-gray-500 text-center mb-6">
-                请检查您的邮箱（包括垃圾邮件文件夹），并点击邮件中的链接重置密码。
+                Please check your email (including spam folder) and click the link to reset your password.
               </p>
               <div className="space-y-2 w-full">
                 <Link href="/login" className="block">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    返回登录页
+                    Back to Login
                   </Button>
                 </Link>
                 <Button
@@ -136,25 +136,25 @@ export default function ForgotPasswordPage() {
                     setEmail("");
                   }}
                 >
-                  重新发送
+                  Resend Email
                 </Button>
               </div>
             </div>
           ) : (
             <>
-              {/* 错误提示 */}
+              {/* Error Message */}
               {(formError || error) && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                   {formError || error}
                 </div>
               )}
 
-              {/* 密码重置表单 */}
+              {/* Password Reset Form */}
               <form onSubmit={handleResetPassword} className="space-y-4">
-                {/* Email 输入框 */}
+                {/* Email Input */}
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                    邮箱
+                    Email
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -171,7 +171,7 @@ export default function ForgotPasswordPage() {
                   </div>
                 </div>
 
-                {/* 发送重置邮件按钮 */}
+                {/* Send Reset Email Button */}
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -180,19 +180,19 @@ export default function ForgotPasswordPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      发送中...
+                      Sending...
                     </>
                   ) : (
-                    "发送重置邮件"
+                    "Send Reset Email"
                   )}
                 </Button>
               </form>
 
-              {/* 返回登录链接 */}
+              {/* Back to Login Link */}
               <div className="text-center text-sm text-gray-600">
                 <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline inline-flex items-center">
                   <ArrowLeft className="mr-1 h-4 w-4" />
-                  返回登录页
+                  Back to Login
                 </Link>
               </div>
             </>

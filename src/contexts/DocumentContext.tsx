@@ -19,6 +19,7 @@ interface DocumentContextType {
   documents: Document[];
   addDocument: (file: File) => Promise<void>;
   deleteDocument: (id: number) => Promise<void>;
+  downloadDocument: (doc: Document) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -63,11 +64,13 @@ export function DocumentProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
 
-      // 1. 生成唯一的文件路径
+      // 1. 生成唯一的文件路径（使用 UUID 避免中文字符问题）
       const timestamp = Date.now();
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${timestamp}-${file.name}`;
-      const filePath = `documents/${fileName}`;
+      const fileExtension = file.name.split('.').pop() || '';
+      // 生成安全的文件名：timestamp-uuid.ext（只包含 ASCII 字符）
+      const safeFileName = `${timestamp}-${crypto.randomUUID()}.${fileExtension}`;
+      // 注意：filePath 不需要包含 bucket 名称，因为 .from('documents') 已经指定了 bucket
+      const filePath = safeFileName;
 
       // 2. 上传文件到 Supabase Storage
       const { error: uploadError } = await supabase.storage
@@ -151,8 +154,43 @@ export function DocumentProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const downloadDocument = async (doc: Document) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // 1. 从 Supabase Storage 下载文件
+      const { data, error: downloadError } = await supabase.storage
+        .from('documents')
+        .download(doc.file_path);
+
+      if (downloadError) throw downloadError;
+
+      // 2. 创建 Blob URL
+      const url = URL.createObjectURL(data);
+
+      // 3. 创建临时 <a> 标签并触发下载
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = doc.name; // 使用原始文件名
+      document.body.appendChild(a);
+      a.click();
+
+      // 4. 清理
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+    } catch (err) {
+      console.error("Failed to download document:", err);
+      setError(err instanceof Error ? err.message : "Failed to download document");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <DocumentContext.Provider value={{ documents, addDocument, deleteDocument, loading, error }}>
+    <DocumentContext.Provider value={{ documents, addDocument, deleteDocument, downloadDocument, loading, error }}>
       {children}
     </DocumentContext.Provider>
   );

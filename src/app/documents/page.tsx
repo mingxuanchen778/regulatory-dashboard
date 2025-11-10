@@ -7,7 +7,7 @@ import { useDocuments } from "@/contexts/DocumentContext";
 import { useRef } from "react";
 
 export default function DocumentsPage() {
-  const { documents, addDocument, deleteDocument, loading, error } = useDocuments();
+  const { documents, addDocument, deleteDocument, downloadDocument, loading, error } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +29,14 @@ export default function DocumentsPage() {
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleDownload = async (doc: typeof documents[0]) => {
+    try {
+      await downloadDocument(doc);
+    } catch (err) {
+      console.error("Failed to download file:", doc.name, err);
+    }
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -149,7 +157,13 @@ export default function DocumentsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-600">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-600 hover:text-blue-600"
+                        onClick={() => handleDownload(doc)}
+                        disabled={loading}
+                      >
                         <Download className="w-4 h-4" />
                       </Button>
                       <Button

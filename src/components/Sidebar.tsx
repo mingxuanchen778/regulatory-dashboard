@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { FileText, Bookmark, Bell, MessageSquare, Menu, X, Activity, LucideIcon } from "lucide-react";
+import { FileText, Bookmark, Bell, MessageSquare, Menu, X, Activity, LucideIcon, LogIn, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -119,76 +119,83 @@ export function Sidebar() {
                 </li>
               );
             })}
+
+            {/* Login/Registration buttons - only show when not logged in */}
+            {!loading && !user && (
+              <>
+                <li className="pt-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block"
+                  >
+                    <Button
+                      variant="default"
+                      className="w-full justify-start gap-3 px-3 py-2 h-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                    >
+                      <LogIn className="w-5 h-5" />
+                      <span>Sign In</span>
+                    </Button>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block"
+                  >
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-3 px-3 py-2 h-auto border-blue-600 text-blue-600 hover:bg-blue-50"
+                    >
+                      <UserPlus className="w-5 h-5" />
+                      <span>Sign Up</span>
+                    </Button>
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
 
-        {/* 用户信息和登出区域 */}
-        <div className="p-4 border-t border-gray-200">
-          {loading ? (
-            // 加载状态：显示骨架屏
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 animate-pulse">
-                <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-20 bg-gray-300 rounded"></div>
-                  <div className="h-3 w-32 bg-gray-300 rounded"></div>
+        {/* User Info and Sign Out Area - Only show when logged in */}
+        {!loading && user && (
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              {/* User Avatar: Show real avatar if available, otherwise show initial placeholder */}
+              {user.user_metadata?.avatar_url ? (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt="User avatar"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
-              </div>
-              <div className="h-9 w-full bg-gray-300 rounded animate-pulse"></div>
-            </div>
-          ) : user ? (
-            // 已登录：显示真实用户信息
-            <>
-              <div className="flex items-center gap-3 mb-3">
-                {/* 用户头像：优先显示真实头像，否则显示首字母占位符 */}
-                {user.user_metadata?.avatar_url ? (
-                  <img
-                    src={user.user_metadata.avatar_url}
-                    alt="User avatar"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
-                )}
+              )}
 
-                {/* 用户名称和邮箱 */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {displayName}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {user.email || ""}
-                  </p>
-                </div>
+              {/* User Name and Email */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {displayName}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {user.email || ""}
+                </p>
               </div>
-
-              {/* 登出按钮 */}
-              <Button
-                variant="outline"
-                className="w-full text-sm"
-                onClick={handleSignOut}
-              >
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            // Not logged in: Show login and sign up buttons
-            <div className="space-y-2">
-              <Link href="/login" className="block">
-                <Button variant="default" className="w-full text-sm">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/signup" className="block">
-                <Button variant="outline" className="w-full text-sm">
-                  Sign Up
-                </Button>
-              </Link>
             </div>
-          )}
-        </div>
+
+            {/* Sign Out Button */}
+            <Button
+              variant="outline"
+              className="w-full text-sm"
+              onClick={handleSignOut}
+            >
+              Sign Out
+            </Button>
+          </div>
+        )}
       </aside>
     </>
   );

@@ -63,47 +63,6 @@ export default function Home() {
           <p className="text-sm sm:text-base text-gray-600">Your regulatory compliance dashboard - Navigate with confidence</p>
         </div>
 
-        {/* Top Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mb-6">
-          <Card className="border-green-200 bg-green-50/50 transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-3">
-                    <FileText className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-1">{documents.length}</div>
-                  <div className="text-sm font-medium text-gray-700">Documents</div>
-                  <div className="text-xs text-gray-500">Regulatory documents uploaded</div>
-                </div>
-                <button
-                  onClick={handleUploadClick}
-                  className="text-xs text-green-700 hover:underline flex items-center gap-1"
-                >
-                  <Upload className="w-3 h-3" />
-                  Upload Document
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-purple-200 bg-purple-50/50 transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-3">
-                    <Bookmark className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-1">0</div>
-                  <div className="text-sm font-medium text-gray-700">Bookmarked</div>
-                  <div className="text-xs text-gray-500">Saved regulatory searches</div>
-                </div>
-                <a href="/bookmarks" className="text-xs text-purple-700 hover:underline">View Bookmarks</a>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
           <Card className="border-purple-200 bg-purple-50/30 transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
@@ -278,6 +237,47 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Top Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mt-6">
+          <Card className="border-green-200 bg-green-50/50 transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-3">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-gray-900 mb-1">{documents.length}</div>
+                  <div className="text-sm font-medium text-gray-700">Documents</div>
+                  <div className="text-xs text-gray-500">Regulatory documents uploaded</div>
+                </div>
+                <button
+                  onClick={handleUploadClick}
+                  className="text-xs text-green-700 hover:underline flex items-center gap-1"
+                >
+                  <Upload className="w-3 h-3" />
+                  Upload Document
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-purple-200 bg-purple-50/50 transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-3">
+                    <Bookmark className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-gray-900 mb-1">0</div>
+                  <div className="text-sm font-medium text-gray-700">Bookmarked</div>
+                  <div className="text-xs text-gray-500">Saved regulatory searches</div>
+                </div>
+                <a href="/bookmarks" className="text-xs text-purple-700 hover:underline">View Bookmarks</a>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* 全局模板库模态对话框 */}

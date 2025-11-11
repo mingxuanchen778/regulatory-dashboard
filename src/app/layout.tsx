@@ -6,6 +6,7 @@ import { LayoutWrapper } from "@/components/LayoutWrapper";
 import { DocumentProvider } from "@/contexts/DocumentContext";
 import { BookmarkProvider } from "@/contexts/BookmarkContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { TemplateProvider } from "@/contexts/TemplateContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,9 +42,11 @@ export default function RootLayout({
           <AuthProvider>
             <DocumentProvider>
               <BookmarkProvider>
-                <LayoutWrapper>
-                  {children}
-                </LayoutWrapper>
+                <TemplateProvider>
+                  <LayoutWrapper>
+                    {children}
+                  </LayoutWrapper>
+                </TemplateProvider>
               </BookmarkProvider>
             </DocumentProvider>
           </AuthProvider>

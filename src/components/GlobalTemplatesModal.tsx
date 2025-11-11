@@ -37,12 +37,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  MOCK_TEMPLATES,
   CATEGORIES,
   COUNTRIES,
   filterTemplates,
 } from "@/lib/templates-data";
 import type { Category, Country, Template } from "@/types/template";
+import { useTemplates } from "@/contexts/TemplateContext";
 
 /**
  * GlobalTemplatesModal 组件属性
@@ -64,22 +64,26 @@ export function GlobalTemplatesModal({
   open,
   onOpenChange,
 }: GlobalTemplatesModalProps) {
+  // 从 TemplateContext 获取数据和方法
+  const { templates, loading, error, downloadTemplate } = useTemplates();
+
   // 状态管理
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedCategory, setSelectedCategory] =
     React.useState<Category>("All Categories");
   const [selectedCountry, setSelectedCountry] =
     React.useState<Country>("All Countries");
+  const [downloadingId, setDownloadingId] = React.useState<string | null>(null);
 
   // 筛选模板
   const filteredTemplates = React.useMemo(() => {
     return filterTemplates(
-      MOCK_TEMPLATES,
+      templates,
       searchQuery,
       selectedCategory,
       selectedCountry
     );
-  }, [searchQuery, selectedCategory, selectedCountry]);
+  }, [templates, searchQuery, selectedCategory, selectedCountry]);
 
   // 仅显示精选模板
   const featuredTemplates = filteredTemplates.filter((t) => t.isFeatured);
@@ -88,10 +92,16 @@ export function GlobalTemplatesModal({
    * 处理模板下载
    * @param template - 要下载的模板
    */
-  const handleDownload = (template: Template) => {
-    // TODO: 实现真实的下载逻辑
-    // 目前显示提示信息
-    alert(`下载模板: ${template.name}\n格式: ${template.format}\n完成度: ${template.completeness}%`);
+  const handleDownload = async (template: Template) => {
+    try {
+      setDownloadingId(template.id);
+      await downloadTemplate(template);
+    } catch (err) {
+      console.error('Failed to download template:', err);
+      // 错误已在 Context 中处理
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   return (
@@ -174,12 +184,22 @@ export function GlobalTemplatesModal({
 
           {/* 模板网格 - 3列布局 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featuredTemplates.length > 0 ? (
+            {loading && templates.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                <p>Loading templates...</p>
+              </div>
+            ) : error ? (
+              <div className="col-span-full text-center py-12 text-red-500">
+                <p>Failed to load templates</p>
+                <p className="text-sm mt-2">{error}</p>
+              </div>
+            ) : featuredTemplates.length > 0 ? (
               featuredTemplates.map((template) => (
                 <TemplateCard
                   key={template.id}
                   template={template}
                   onDownload={handleDownload}
+                  isDownloading={downloadingId === template.id}
                 />
               ))
             ) : (
@@ -215,6 +235,8 @@ interface TemplateCardProps {
   template: Template;
   /** 下载回调 */
   onDownload: (template: Template) => void;
+  /** 是否正在下载 */
+  isDownloading?: boolean;
 }
 
 /**
@@ -226,7 +248,7 @@ interface TemplateCardProps {
  * - 使用completeness字段（关键修正2）
  * - 元数据使用emoji（关键修正5）
  */
-function TemplateCard({ template, onDownload }: TemplateCardProps) {
+function TemplateCard({ template, onDownload, isDownloading = false }: TemplateCardProps) {
   return (
     <div className="bg-yellow-50/50 border border-yellow-200 rounded-lg p-4 hover:shadow-lg transition-all duration-300">
       {/* 卡片头部：国家标识和Official标签 */}
@@ -269,10 +291,11 @@ function TemplateCard({ template, onDownload }: TemplateCardProps) {
       {/* 下载按钮 - 紫粉渐变 */}
       <Button
         onClick={() => onDownload(template)}
-        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+        disabled={isDownloading}
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Download className="w-4 h-4 mr-2" />
-        Download Template
+        {isDownloading ? 'Downloading...' : 'Download Template'}
       </Button>
     </div>
   );

@@ -292,12 +292,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ============================================================
 
   useEffect(() => {
-    // 获取初始会话
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // 获取初始会话（带错误处理）
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          // 如果是 refresh token 错误，清理本地存储并继续
+          if (error.message?.includes('refresh') || error.message?.includes('token')) {
+            console.warn('Invalid refresh token detected, clearing auth state:', error.message);
+            // 清理 Supabase 的本地存储
+            supabase.auth.signOut({ scope: 'local' }).catch(console.error);
+          } else {
+            console.error('Failed to get session:', error);
+          }
+          // 即使出错也要设置为未登录状态
+          setSession(null);
+          setUser(null);
+        } else {
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Unexpected error getting session:', err);
+        setSession(null);
+        setUser(null);
+        setLoading(false);
+      });
 
     // 监听认证状态变化
     const {

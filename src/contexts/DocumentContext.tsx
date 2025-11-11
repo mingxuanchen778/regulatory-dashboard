@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { getSupabase } from "@/lib/supabase";
+import { downloadFromStorage } from "@/lib/storage-utils";
 
 export interface Document {
   id: number;
@@ -159,26 +160,8 @@ export function DocumentProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
 
-      // 1. 从 Supabase Storage 下载文件
-      const { data, error: downloadError } = await supabase.storage
-        .from('documents')
-        .download(doc.file_path);
-
-      if (downloadError) throw downloadError;
-
-      // 2. 创建 Blob URL
-      const url = URL.createObjectURL(data);
-
-      // 3. 创建临时 <a> 标签并触发下载
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = doc.name; // 使用原始文件名
-      document.body.appendChild(a);
-      a.click();
-
-      // 4. 清理
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // 使用共享的下载工具函数
+      await downloadFromStorage('documents', doc.file_path, doc.name);
 
     } catch (err) {
       console.error("Failed to download document:", err);

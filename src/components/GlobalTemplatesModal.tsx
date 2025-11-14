@@ -231,10 +231,10 @@ export function GlobalTemplatesModal({
               <span>All Templates ({allTemplates.length})</span>
             </h3>
 
-            {/* 模板网格 - 3列布局 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* 模板列表 - 单列布局，使用紧凑卡片样式 */}
+            <div className="flex flex-col gap-3">
               {allTemplates.map((template) => (
-                <TemplateCard
+                <CompactTemplateCard
                   key={template.id}
                   template={template}
                   onDownload={handleDownload}
@@ -357,3 +357,84 @@ function TemplateCard({ template, onDownload, isDownloading = false }: TemplateC
   );
 }
 
+/**
+ * 紧凑列表样式的模板卡片组件
+ * 用于 "All Templates" 部分
+ *
+ * 样式特点：
+ * - 水平布局：国家代码 | 内容区 | 下载按钮
+ * - 白色背景，浅灰色边框
+ * - 紧凑间距，单行元数据
+ * - 右侧固定宽度的下载按钮
+ */
+function CompactTemplateCard({ template, onDownload, isDownloading = false }: TemplateCardProps) {
+  // 检查是否为外部链接
+  const isExternalLink = template.downloadUrl.startsWith('http://') ||
+                         template.downloadUrl.startsWith('https://');
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200">
+      <div className="flex items-start gap-4">
+        {/* 左侧：国家代码 */}
+        <div className="flex-shrink-0">
+          <div className="bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded min-w-[32px] text-center">
+            {template.countryCode}
+          </div>
+        </div>
+
+        {/* 中间：内容区 */}
+        <div className="flex-1 min-w-0">
+          {/* 标题行：标题 + Official标签 */}
+          <div className="flex items-start gap-2 mb-1">
+            <h4 className="font-semibold text-gray-900 text-sm flex-1">
+              {template.name}
+            </h4>
+            {template.isOfficial && (
+              <Badge
+                variant="outline"
+                className="bg-green-100 text-green-700 border-green-300 text-xs flex-shrink-0"
+              >
+                ✓ Official
+              </Badge>
+            )}
+          </div>
+
+          {/* 描述 */}
+          <p className="text-xs text-gray-600 mb-1 line-clamp-1">
+            {template.description}
+          </p>
+
+          {/* 元数据行：使用 · 分隔符 */}
+          <div className="text-xs text-gray-500">
+            <span>{template.authority}</span>
+            <span className="mx-1">·</span>
+            <span>{template.category}</span>
+            <span className="mx-1">·</span>
+            <span>{template.date}</span>
+            <span className="mx-1">·</span>
+            <span>{template.completeness}% popularity</span>
+          </div>
+        </div>
+
+        {/* 右侧：格式标签 + 下载按钮 */}
+        <div className="flex-shrink-0 flex flex-col items-end gap-2">
+          {/* 格式标签 */}
+          <div className="text-xs text-gray-500 font-medium">
+            {template.format}
+          </div>
+
+          {/* 下载按钮 */}
+          <Button
+            onClick={() => onDownload(template)}
+            disabled={isDownloading}
+            size="sm"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+          >
+            <Download className="w-3 h-3 mr-1" />
+            {isDownloading ? 'Loading...' : 'Download'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

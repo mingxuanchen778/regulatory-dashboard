@@ -11,7 +11,8 @@
     "format": "bunx biome format --write",
     "bulk-upload": "node scripts/bulk-upload.js",
     "bulk-upload:test": "SOURCE_DIR=./test-documents CONCURRENCY=5 node scripts/bulk-upload.js",
-    "check-oauth": "node scripts/check-oauth-config.js"
+    "check-oauth": "node scripts/check-oauth-config.js",
+    "import-fda": "node scripts/import-fda-guidance.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

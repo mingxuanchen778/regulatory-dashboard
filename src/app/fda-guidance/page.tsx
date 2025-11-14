@@ -19,15 +19,19 @@ import {
   AlertCircle,
   Bookmark,
   FileDown,
-  X
+  X,
+  Loader2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import type { GuidanceDocument, DateRange } from "@/types/fda-guidance";
 import {
-  FDA_GUIDANCE_DOCUMENTS,
-  STATUS_OPTIONS,
-  ORGANIZATION_OPTIONS,
-  TOPIC_OPTIONS
-} from "@/lib/fda-guidance-data";
+  fetchGuidanceDocuments,
+  fetchStatusOptions,
+  fetchOrganizationOptions,
+  fetchTopicOptions,
+  type FetchGuidanceParams
+} from "@/lib/fda-guidance-api";
 
 
 export default function FDAGuidancePage() {
@@ -42,6 +46,22 @@ export default function FDAGuidancePage() {
 
   // 日期范围筛选状态
   const [dateRange, setDateRange] = useState<DateRange>({ start: "", end: "" });
+
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(50);
+
+  // 数据状态
+  const [documents, setDocuments] = useState<GuidanceDocument[]>([]);
+  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 筛选选项状态
+  const [statusOptions, setStatusOptions] = useState<string[]>(["All Statuses", "Final", "Draft"]);
+  const [organizationOptions, setOrganizationOptions] = useState<string[]>(["All Organizations"]);
+  const [topicOptions, setTopicOptions] = useState<string[]>(["All Topics"]);
 
   // UI 状态
   const [expandedDocs, setExpandedDocs] = useState<Set<string>>(new Set());
@@ -69,6 +89,63 @@ export default function FDAGuidancePage() {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // 加载筛选选项
+  useEffect(() => {
+    const loadFilterOptions = async () => {
+      try {
+        const [statuses, organizations, topics] = await Promise.all([
+          fetchStatusOptions(),
+          fetchOrganizationOptions(),
+          fetchTopicOptions()
+        ]);
+        setStatusOptions(statuses);
+        setOrganizationOptions(organizations);
+        setTopicOptions(topics);
+      } catch (err) {
+        console.error('Failed to load filter options:', err);
+      }
+    };
+    loadFilterOptions();
+  }, []);
+
+  // 加载文档数据
+  useEffect(() => {
+    const loadDocuments = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const params: FetchGuidanceParams = {
+          page: currentPage,
+          pageSize,
+          status: selectedStatus !== "All Statuses" ? selectedStatus : undefined,
+          organization: selectedOrganization !== "All Organizations" ? selectedOrganization : undefined,
+          topics: selectedTopic !== "All Topics" ? [selectedTopic] : undefined,
+          searchQuery: debouncedSearchQuery || undefined,
+          dateRange: (dateRange.start || dateRange.end) ? {
+            start: dateRange.start || undefined,
+            end: dateRange.end || undefined
+          } : undefined
+        };
+
+        const result = await fetchGuidanceDocuments(params);
+        setDocuments(result.data);
+        setTotalDocuments(result.total);
+        setTotalPages(result.totalPages);
+      } catch (err) {
+        console.error('Failed to load documents:', err);
+        setError('Failed to load documents. Please try again.');
+        setDocuments([]);
+        setTotalDocuments(0);
+        setTotalPages(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDocuments();
+  }, [currentPage, pageSize, selectedStatus, selectedOrganization, selectedTopic, debouncedSearchQuery, dateRange]);
 
   // 日期范围快捷选项
   const setDateRangePreset = (preset: string) => {
@@ -112,50 +189,8 @@ export default function FDAGuidancePage() {
     setSelectedOrganization("All Organizations");
     setSelectedTopic("All Topics");
     setDateRange({ start: "", end: "" });
+    setCurrentPage(1); // 重置到第一页
   };
-
-  // 文档筛选逻辑（增强版）
-  const filteredDocuments = useMemo(() => {
-    return FDA_GUIDANCE_DOCUMENTS.filter(doc => {
-      // 搜索匹配：标题、描述、标签
-      const matchesSearch =
-        debouncedSearchQuery === "" ||
-        doc.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        doc.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        doc.topics.some(topic => topic.toLowerCase().includes(debouncedSearchQuery.toLowerCase()));
-
-      // 状态筛选
-      const matchesStatus = selectedStatus === "All Statuses" || doc.status === selectedStatus;
-
-      // 组织筛选
-      const matchesOrganization = selectedOrganization === "All Organizations" ||
-                                  doc.organization === selectedOrganization;
-
-      // 主题筛选
-      const matchesTopic = selectedTopic === "All Topics" ||
-                          doc.topics.includes(selectedTopic);
-
-      // 日期范围筛选
-      let matchesDateRange = true;
-      if (dateRange.start || dateRange.end) {
-        // 将 "2025/8/18" 转换为 "2025-08-18"
-        const docDateStr = doc.date.replace(/\//g, '-');
-        const docDate = new Date(docDateStr);
-
-        if (dateRange.start) {
-          const startDate = new Date(dateRange.start);
-          if (docDate < startDate) matchesDateRange = false;
-        }
-
-        if (dateRange.end) {
-          const endDate = new Date(dateRange.end);
-          if (docDate > endDate) matchesDateRange = false;
-        }
-      }
-
-      return matchesSearch && matchesStatus && matchesOrganization && matchesTopic && matchesDateRange;
-    });
-  }, [debouncedSearchQuery, selectedStatus, selectedOrganization, selectedTopic, dateRange]);
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedDocs);
@@ -193,7 +228,7 @@ export default function FDAGuidancePage() {
 
   const exportToCSV = () => {
     const headers = ["Title", "Description", "Date", "Organization", "Size", "Status", "Topics"];
-    const rows = filteredDocuments.map(doc => [
+    const rows = documents.map(doc => [
       doc.title,
       doc.description,
       formatDate(doc.date),
@@ -219,7 +254,7 @@ export default function FDAGuidancePage() {
 
   const exportToPDF = () => {
     // Simple PDF export (in production, you'd use a library like jsPDF)
-    const printContent = filteredDocuments.map(doc => `
+    const printContent = documents.map(doc => `
       ${doc.title}
       ${doc.description}
       Date: ${formatDate(doc.date)} | Organization: ${doc.organization}
@@ -244,7 +279,7 @@ export default function FDAGuidancePage() {
           <body>
             <h1>FDA Guidance Documents</h1>
             <p>Exported on: ${new Date().toLocaleDateString()}</p>
-            <p>Total documents: ${filteredDocuments.length}</p>
+            <p>Total documents: ${documents.length}</p>
             <hr />
             <pre>${printContent}</pre>
           </body>
@@ -318,10 +353,13 @@ export default function FDAGuidancePage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                     <select
                       value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedStatus(e.target.value);
+                        setCurrentPage(1); // 重置到第一页
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     >
-                      {STATUS_OPTIONS.map(option => (
+                      {statusOptions.map(option => (
                         <option key={option} value={option}>{option}</option>
                       ))}
                     </select>
@@ -331,10 +369,13 @@ export default function FDAGuidancePage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">FDA Organization</label>
                     <select
                       value={selectedOrganization}
-                      onChange={(e) => setSelectedOrganization(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedOrganization(e.target.value);
+                        setCurrentPage(1); // 重置到第一页
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     >
-                      {ORGANIZATION_OPTIONS.map(option => (
+                      {organizationOptions.map(option => (
                         <option key={option} value={option}>{option}</option>
                       ))}
                     </select>
@@ -344,10 +385,13 @@ export default function FDAGuidancePage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Topic</label>
                     <select
                       value={selectedTopic}
-                      onChange={(e) => setSelectedTopic(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedTopic(e.target.value);
+                        setCurrentPage(1); // 重置到第一页
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     >
-                      {TOPIC_OPTIONS.map(option => (
+                      {topicOptions.map(option => (
                         <option key={option} value={option}>{option}</option>
                       ))}
                     </select>
@@ -416,13 +460,42 @@ export default function FDAGuidancePage() {
 
         {/* Results Header */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-gray-700">Found <span className="font-semibold">{filteredDocuments.length}</span> guidance documents</p>
-          <p className="text-sm text-gray-500">Last updated: 2025/11/3</p>
+          <p className="text-gray-700">
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading...
+              </span>
+            ) : (
+              <>Found <span className="font-semibold">{totalDocuments}</span> guidance documents</>
+            )}
+          </p>
+          <p className="text-sm text-gray-500">Last updated: {new Date().toLocaleDateString()}</p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <Card className="mb-6 border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-red-800">
+                <AlertCircle className="w-5 h-5" />
+                <p>{error}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          </div>
+        )}
+
         {/* Documents List */}
-        <div className="space-y-4">
-          {filteredDocuments.map((doc) => (
+        {!isLoading && !error && (
+          <div className="space-y-4">
+            {documents.map((doc) => (
             <Card key={doc.id} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-4">
@@ -553,7 +626,67 @@ export default function FDAGuidancePage() {
               </CardContent>
             </Card>
           ))}
-        </div>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!isLoading && !error && totalPages > 1 && (
+          <div className="mt-8 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalDocuments)} of {totalDocuments} documents
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={currentPage === pageNum ? "bg-blue-600 hover:bg-blue-700" : ""}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

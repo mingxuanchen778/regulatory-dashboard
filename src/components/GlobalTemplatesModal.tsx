@@ -18,7 +18,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, FileText, Download } from "lucide-react";
+import { Search, FileText, Download, ExternalLink } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -85,14 +85,29 @@ export function GlobalTemplatesModal({
     );
   }, [templates, searchQuery, selectedCategory, selectedCountry]);
 
-  // 仅显示精选模板
+  // 分离精选模板和全部模板
   const featuredTemplates = filteredTemplates.filter((t) => t.isFeatured);
+  const allTemplates = filteredTemplates.filter((t) => !t.isFeatured);
 
   /**
-   * 处理模板下载
-   * @param template - 要下载的模板
+   * 处理模板下载或外部链接跳转
+   * @param template - 要下载的模板或跳转的外部链接
    */
   const handleDownload = async (template: Template) => {
+    // 检查是否为外部链接
+    const isExternalLink = template.downloadUrl.startsWith('http://') ||
+                           template.downloadUrl.startsWith('https://');
+
+    if (isExternalLink) {
+      // 外部链接：在新标签页打开
+      window.open(template.downloadUrl, '_blank', 'noopener,noreferrer');
+
+      // 可选：更新访问次数统计
+      // 这里可以调用 API 更新 download_count
+      return;
+    }
+
+    // 文件下载：执行现有下载逻辑
     try {
       setDownloadingId(template.id);
       await downloadTemplate(template);
@@ -176,42 +191,69 @@ export function GlobalTemplatesModal({
         </div>
 
         {/* 精选模板区域 */}
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <span>⭐</span>
-            <span>Featured Templates</span>
-          </h3>
+        {featuredTemplates.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span>⭐</span>
+              <span>Featured Templates</span>
+            </h3>
 
-          {/* 模板网格 - 3列布局 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {loading && templates.length === 0 ? (
-              <div className="col-span-full text-center py-12 text-gray-500">
-                <p>Loading templates...</p>
-              </div>
-            ) : error ? (
-              <div className="col-span-full text-center py-12 text-red-500">
-                <p>Failed to load templates</p>
-                <p className="text-sm mt-2">{error}</p>
-              </div>
-            ) : featuredTemplates.length > 0 ? (
-              featuredTemplates.map((template) => (
+            {/* 模板网格 - 3列布局 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {loading && templates.length === 0 ? (
+                <div className="col-span-full text-center py-12 text-gray-500">
+                  <p>Loading templates...</p>
+                </div>
+              ) : error ? (
+                <div className="col-span-full text-center py-12 text-red-500">
+                  <p>Failed to load templates</p>
+                  <p className="text-sm mt-2">{error}</p>
+                </div>
+              ) : (
+                featuredTemplates.map((template) => (
+                  <TemplateCard
+                    key={template.id}
+                    template={template}
+                    onDownload={handleDownload}
+                    isDownloading={downloadingId === template.id}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* All Templates 区域 */}
+        {allTemplates.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span>📚</span>
+              <span>All Templates ({allTemplates.length})</span>
+            </h3>
+
+            {/* 模板网格 - 3列布局 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allTemplates.map((template) => (
                 <TemplateCard
                   key={template.id}
                   template={template}
                   onDownload={handleDownload}
                   isDownloading={downloadingId === template.id}
                 />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12 text-gray-500">
-                <p>No templates found matching your criteria.</p>
-                <p className="text-sm mt-2">
-                  Try adjusting your search or filters.
-                </p>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* 无结果提示 */}
+        {!loading && !error && featuredTemplates.length === 0 && allTemplates.length === 0 && (
+          <div className="mt-6 text-center py-12 text-gray-500">
+            <p>No templates found matching your criteria.</p>
+            <p className="text-sm mt-2">
+              Try adjusting your search or filters.
+            </p>
+          </div>
+        )}
 
         {/* 底部说明 */}
         <div className="mt-6 pt-4 border-t border-gray-200">
@@ -242,13 +284,18 @@ interface TemplateCardProps {
 /**
  * 模板卡片组件
  * 展示单个模板的详细信息
- * 
+ *
  * 包含关键修正：
  * - 黄色背景和边框（关键修正3）
  * - 使用completeness字段（关键修正2）
  * - 元数据使用emoji（关键修正5）
+ * - 支持外部链接跳转
  */
 function TemplateCard({ template, onDownload, isDownloading = false }: TemplateCardProps) {
+  // 检查是否为外部链接
+  const isExternalLink = template.downloadUrl.startsWith('http://') ||
+                         template.downloadUrl.startsWith('https://');
+
   return (
     <div className="bg-yellow-50/50 border border-yellow-200 rounded-lg p-4 hover:shadow-lg transition-all duration-300">
       {/* 卡片头部：国家标识和Official标签 */}
@@ -288,14 +335,23 @@ function TemplateCard({ template, onDownload, isDownloading = false }: TemplateC
         <span>{template.format}</span>
       </div>
 
-      {/* 下载按钮 - 紫粉渐变 */}
+      {/* 下载/查看按钮 - 紫粉渐变 */}
       <Button
         onClick={() => onDownload(template)}
         disabled={isDownloading}
         className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <Download className="w-4 h-4 mr-2" />
-        {isDownloading ? 'Downloading...' : 'Download Template'}
+        {isExternalLink ? (
+          <>
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </>
+        ) : (
+          <>
+            <Download className="w-4 h-4 mr-2" />
+            {isDownloading ? 'Downloading...' : 'Download'}
+          </>
+        )}
       </Button>
     </div>
   );

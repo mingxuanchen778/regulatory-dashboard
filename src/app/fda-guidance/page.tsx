@@ -506,10 +506,31 @@ export default function FDAGuidancePage() {
                       />
                     </button>
 
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View Document
-                    </Button>
+                    {/* View Document Button - 如果有URL则打开链接，否则禁用 */}
+                    {doc.url ? (
+                      <Button
+                        className="bg-blue-600 hover:bg-blue-700"
+                        asChild
+                      >
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View Document
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button
+                        className="bg-gray-400 cursor-not-allowed"
+                        disabled
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Document
+                      </Button>
+                    )}
+
                     <button
                       onClick={() => toggleExpanded(doc.id)}
                       className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"

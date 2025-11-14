@@ -71,7 +71,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     status: "Draft",
     topics: ["Clinical - Medical", "Oncology"],
     commentPeriodCloses: "2025/11/18",
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/oncology-therapeutic-radiopharmaceuticals-dosage-optimization-during-clinical-development"
   },
   {
     id: "2",
@@ -83,7 +84,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     status: "Draft",
     topics: ["Clinical - Medical", "Oncology"],
     commentPeriodCloses: "2025/11/18",
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/approaches-assessment-overall-survival-oncology-clinical-trials"
   },
   {
     id: "3",
@@ -94,7 +96,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     size: "650.59 KB",
     status: "Final",
     topics: ["Premarket", "Digital Health"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/marketing-submission-recommendations-predetermined-change-control-plan-artificial-intelligence-enabled-device"
   },
   {
     id: "4",
@@ -106,7 +109,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     status: "Draft",
     topics: ["ICH-Efficacy"],
     commentPeriodCloses: "2025/10/30",
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/e21-inclusion-pregnant-and-breastfeeding-women-clinical-trials"
   },
   {
     id: "5",
@@ -117,7 +121,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     size: "398.07 KB",
     status: "Final",
     topics: ["Administrative / Procedural", "Biosimilars"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/formal-meetings-between-fda-and-sponsors-or-applicants-bsufa-products"
   },
   {
     id: "6",
@@ -129,7 +134,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     status: "Draft",
     topics: ["Clinical - Medical", "Oncology"],
     commentPeriodCloses: "2025/10/18",
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/development-cancer-drugs-use-novel-combination-determining-contribution-individual-drugs-effects"
   },
   {
     id: "7",
@@ -140,7 +146,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     size: "424.58 KB",
     status: "Draft",
     topics: ["Clinical - Medical"],
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/small-volume-parenteral-drug-products-and-pharmacy-bulk-packages-parenteral-nutrition-aluminum"
   },
   {
     id: "8",
@@ -151,7 +158,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     size: "469.61 KB",
     status: "Draft",
     topics: ["Clinical - Medical", "Oncology"],
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/myelodysplastic-syndromes-developing-drug-and-biological-products-treatment"
   },
   {
     id: "9",
@@ -162,7 +170,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     size: "288.25 KB",
     status: "Final",
     topics: ["Clinical - Antimicrobial", "Infectious Diseases"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/antibacterial-therapies-patients-unmet-medical-need-treatment-serious-bacterial-diseases-questions-and"
   },
   {
     id: "10",
@@ -173,7 +182,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     size: "308.37 KB",
     status: "Final",
     topics: ["Clinical - Medical", "Infectious Diseases"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/early-lyme-disease-manifested-erythema-migrans-developing-drugs-treatment"
   },
   {
     id: "11",
@@ -183,7 +193,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Devices and Radiological Health",
     status: "Final",
     topics: ["Digital Health", "Software"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/software-medical-device-samd-clinical-evaluation"
   },
   {
     id: "12",
@@ -193,7 +204,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Devices and Radiological Health",
     status: "Final",
     topics: ["Cybersecurity", "Premarket"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cybersecurity-medical-devices-quality-system-considerations-and-content-premarket-submissions"
   },
   {
     id: "13",
@@ -203,7 +215,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Devices and Radiological Health",
     status: "Draft",
     topics: ["Digital Health", "Software"],
-    icon: "edit"
+    icon: "edit",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software"
   },
   {
     id: "14",
@@ -213,7 +226,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Devices and Radiological Health",
     status: "Final",
     topics: ["Quality Systems", "Manufacturing"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/quality-system-qs-regulationmedical-device-good-manufacturing-practices"
   },
   {
     id: "15",
@@ -223,7 +237,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Devices and Radiological Health",
     status: "Final",
     topics: ["Design Controls", "Quality Systems"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/design-controls-guidance-medical-device-manufacturers"
   },
   {
     id: "16",
@@ -233,7 +248,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Drug Evaluation and Research",
     status: "Final",
     topics: ["NDA", "Drug Approval"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/drugs/types-applications/new-drug-application-nda"
   },
   {
     id: "17",
@@ -243,7 +259,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Drug Evaluation and Research",
     status: "Final",
     topics: ["ANDA", "Generic Drugs"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/drugs/types-applications/abbreviated-new-drug-application-anda"
   },
   {
     id: "18",
@@ -253,7 +270,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Drug Evaluation and Research",
     status: "Final",
     topics: ["IND", "Clinical Trials"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/drugs/types-applications/investigational-new-drug-ind-application"
   },
   {
     id: "19",
@@ -263,7 +281,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Biologics Evaluation and Research",
     status: "Final",
     topics: ["BLA", "Biologics Approval"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/vaccines-blood-biologics/biologics-license-applications-bla-process-cber"
   },
   {
     id: "20",
@@ -273,7 +292,8 @@ export const FDA_GUIDANCE_DOCUMENTS: GuidanceDocument[] = [
     organization: "Center for Drug Evaluation and Research",
     status: "Final",
     topics: ["Biosimilars", "Product Development"],
-    icon: "file"
+    icon: "file",
+    url: "https://www.fda.gov/drugs/biosimilars/biosimilar-product-development"
   }
 ];
 

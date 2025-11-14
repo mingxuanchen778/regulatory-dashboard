@@ -19,6 +19,7 @@
  * @property icon - 图标类型
  * @property regulatoryPathways - 监管路径（可选）
  * @property deviceClass - 设备分类（可选）
+ * @property url - FDA官方文档链接（可选）
  */
 export interface GuidanceDocument {
   id: string;
@@ -33,6 +34,7 @@ export interface GuidanceDocument {
   icon: "edit" | "file" | "heart";
   regulatoryPathways?: string[];
   deviceClass?: string[];
+  url?: string;
 }
 
 /**

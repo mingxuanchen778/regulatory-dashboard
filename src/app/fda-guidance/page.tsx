@@ -46,6 +46,7 @@ export default function FDAGuidancePage() {
   // UI 状态
   const [expandedDocs, setExpandedDocs] = useState<Set<string>>(new Set());
   const [previewDoc, setPreviewDoc] = useState<GuidanceDocument | null>(null);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
 
   // 书签功能
   const { bookmarks, addBookmark, removeBookmark, isBookmarked } = useBookmarks();
@@ -293,9 +294,14 @@ export default function FDAGuidancePage() {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <Button variant="outline" className="px-4">
+              <Button
+                variant="outline"
+                className="px-4"
+                onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+              >
                 <Filter className="w-4 h-4 mr-2" />
                 Filters
+                <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${isFiltersExpanded ? 'rotate-180' : ''}`} />
               </Button>
               <Button className="px-6 bg-blue-600 hover:bg-blue-700">
                 <Search className="w-4 h-4 mr-2" />
@@ -303,112 +309,93 @@ export default function FDAGuidancePage() {
               </Button>
             </div>
 
-            {/* Filter Dropdowns */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  {STATUS_OPTIONS.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
+            {/* Collapsible Filter Section */}
+            {isFiltersExpanded && (
+              <div className="animate-in slide-in-from-top-2 duration-300">
+                {/* Filter Dropdowns */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                      {STATUS_OPTIONS.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">FDA Organization</label>
-                <select
-                  value={selectedOrganization}
-                  onChange={(e) => setSelectedOrganization(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  {ORGANIZATION_OPTIONS.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">FDA Organization</label>
+                    <select
+                      value={selectedOrganization}
+                      onChange={(e) => setSelectedOrganization(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                      {ORGANIZATION_OPTIONS.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Topic</label>
-                <select
-                  value={selectedTopic}
-                  onChange={(e) => setSelectedTopic(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  {TOPIC_OPTIONS.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Date Range Filter */}
-            <div className="border-t border-gray-200 pt-4" lang="en-US">
-              <label className="block text-sm font-medium text-gray-700 mb-3">Date Range</label>
-
-              {/* Quick Presets */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDateRangePreset("30days")}
-                  className="text-xs"
-                >
-                  Last 30 Days
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDateRangePreset("6months")}
-                  className="text-xs"
-                >
-                  Last 6 Months
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDateRangePreset("1year")}
-                  className="text-xs"
-                >
-                  Last Year
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDateRangePreset("all")}
-                  className="text-xs"
-                >
-                  All Time
-                </Button>
-              </div>
-
-              {/* Custom Date Inputs */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" lang="en-US">
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Start Date</label>
-                  <input
-                    type="date"
-                    lang="en-US"
-                    value={dateRange.start}
-                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Topic</label>
+                    <select
+                      value={selectedTopic}
+                      onChange={(e) => setSelectedTopic(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                      {TOPIC_OPTIONS.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">End Date</label>
-                  <input
-                    type="date"
-                    lang="en-US"
-                    value={dateRange.end}
-                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                  />
+
+                {/* Date Range Filter */}
+                <div className="border-t border-gray-200 pt-4" lang="en-US">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Date Range</label>
+
+                  {/* Quick Presets */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDateRangePreset("30days")}
+                      className="text-xs"
+                    >
+                      Last 30 Days
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDateRangePreset("6months")}
+                      className="text-xs"
+                    >
+                      Last 6 Months
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDateRangePreset("1year")}
+                      className="text-xs"
+                    >
+                      Last Year
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDateRangePreset("all")}
+                      className="text-xs"
+                    >
+                      All Time
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Clear Filters Button */}
             {(debouncedSearchQuery || selectedStatus !== "All Statuses" || selectedOrganization !== "All Organizations" || selectedTopic !== "All Topics" || dateRange.start || dateRange.end) && (

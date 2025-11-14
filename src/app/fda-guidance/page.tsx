@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,240 +21,140 @@ import {
   FileDown,
   X
 } from "lucide-react";
+import type { GuidanceDocument, DateRange } from "@/types/fda-guidance";
+import {
+  FDA_GUIDANCE_DOCUMENTS,
+  STATUS_OPTIONS,
+  ORGANIZATION_OPTIONS,
+  TOPIC_OPTIONS
+} from "@/lib/fda-guidance-data";
 
-interface GuidanceDocument {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  organization: string;
-  size: string;
-  status: "Final" | "Draft";
-  topics: string[];
-  commentPeriodCloses?: string;
-  icon: "edit" | "file" | "heart";
-}
-
-// 模拟文档数据（移到组件外部以避免 React Hook 依赖警告）
-const ALL_DOCUMENTS: GuidanceDocument[] = [
-  {
-    id: "1",
-    title: "Oncology Therapeutic Radiopharmaceuticals: Dosage Optimization During Clinical Development",
-    description: "Draft guidance for industry on dosage optimization strategies for oncology therapeutic radiopharmaceuticals during clinical development",
-    date: "2025/8/18",
-    organization: "Oncology Center of Excellence",
-    size: "362.51 KB",
-    status: "Draft",
-    topics: ["Clinical - Medical", "Oncology"],
-    commentPeriodCloses: "2025/11/18",
-    icon: "edit"
-  },
-  {
-    id: "2",
-    title: "Artificial Intelligence and Machine Learning (AI/ML)-Enabled Medical Devices",
-    description: "Marketing submission recommendations for AI/ML-enabled medical devices",
-    date: "2024/10/15",
-    organization: "Center for Devices and Radiological Health",
-    size: "1.23 MB",
-    status: "Final",
-    topics: ["AI/ML", "Digital Health", "Premarket"],
-    icon: "file"
-  },
-  {
-    id: "3",
-    title: "Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions",
-    description: "Draft guidance on cybersecurity considerations for medical device manufacturers",
-    date: "2024/9/29",
-    organization: "Center for Devices and Radiological Health",
-    size: "856.34 KB",
-    status: "Draft",
-    topics: ["Cybersecurity", "Quality Systems", "Premarket"],
-    commentPeriodCloses: "2024/12/29",
-    icon: "edit"
-  },
-  {
-    id: "4",
-    title: "Software as a Medical Device (SaMD): Clinical Evaluation",
-    description: "Guidance on clinical evaluation requirements for software as a medical device",
-    date: "2024/8/22",
-    organization: "Center for Devices and Radiological Health",
-    size: "678.90 KB",
-    status: "Final",
-    topics: ["Software", "Digital Health", "Clinical - Medical"],
-    icon: "file"
-  },
-  {
-    id: "5",
-    title: "Decentralized Clinical Trials for Drugs, Biological Products, and Devices",
-    description: "Guidance on conducting decentralized clinical trials",
-    date: "2024/7/10",
-    organization: "Center for Drug Evaluation and Research",
-    size: "945.12 KB",
-    status: "Final",
-    topics: ["Clinical Trials", "Clinical - Medical"],
-    icon: "file"
-  },
-  {
-    id: "6",
-    title: "Biosimilar Product Development: Chemistry, Manufacturing, and Controls",
-    description: "Guidance on CMC considerations for biosimilar product development",
-    date: "2024/6/18",
-    organization: "Center for Biologics Evaluation and Research",
-    size: "1.45 MB",
-    status: "Final",
-    topics: ["Biosimilars", "Manufacturing"],
-    icon: "file"
-  },
-  {
-    id: "7",
-    title: "Generic Drug User Fee Amendments (GDUFA): Regulatory Science Initiatives",
-    description: "Overview of GDUFA regulatory science initiatives",
-    date: "2024/5/25",
-    organization: "Center for Drug Evaluation and Research",
-    size: "523.67 KB",
-    status: "Final",
-    topics: ["Generic Drugs", "ANDA"],
-    icon: "file"
-  },
-  {
-    id: "8",
-    title: "Investigational New Drug Applications: Determining Whether Human Research Studies Can Be Conducted Without an IND",
-    description: "Guidance on when an IND application is required for human research studies",
-    date: "2024/4/30",
-    organization: "Center for Drug Evaluation and Research",
-    size: "789.23 KB",
-    status: "Final",
-    topics: ["IND", "Clinical Trials"],
-    icon: "file"
-  },
-  {
-    id: "9",
-    title: "Biologics License Applications: Chemistry, Manufacturing, and Controls Information",
-    description: "Guidance on CMC information requirements for BLA submissions",
-    date: "2024/3/15",
-    organization: "Center for Biologics Evaluation and Research",
-    size: "1.12 MB",
-    status: "Final",
-    topics: ["BLA", "Manufacturing"],
-    icon: "file"
-  },
-  {
-    id: "10",
-    title: "Oncology Drug Development: Considerations for Accelerated Approval",
-    description: "Guidance on accelerated approval pathways for oncology drugs",
-    date: "2024/2/20",
-    organization: "Oncology Center of Excellence",
-    size: "834.56 KB",
-    status: "Final",
-    topics: ["Oncology", "Product Development"],
-    icon: "heart"
-  },
-  {
-    id: "11",
-    title: "Administrative Procedures: Meetings with FDA Staff",
-    description: "Guidance on requesting and conducting meetings with FDA staff",
-    date: "2024/1/10",
-    organization: "Office of the Commissioner",
-    size: "456.78 KB",
-    status: "Final",
-    topics: ["Administrative / Procedural"],
-    icon: "file"
-  },
-  {
-    id: "12",
-    title: "Women's Health Research: Considerations for Clinical Trials",
-    description: "Guidance on including women in clinical trials and analyzing sex differences",
-    date: "2023/12/5",
-    organization: "Office of Women's Health",
-    size: "712.34 KB",
-    status: "Final",
-    topics: ["Clinical Trials", "Clinical - Medical"],
-    icon: "heart"
-  },
-  {
-    id: "13",
-    title: "ICH E6(R3) Good Clinical Practice: Integrated Addendum",
-    description: "ICH guidance on good clinical practice standards",
-    date: "2023/11/15",
-    organization: "Center for Drug Evaluation and Research",
-    size: "1.67 MB",
-    status: "Final",
-    topics: ["ICH-Efficacy", "Clinical Trials"],
-    icon: "file"
-  },
-  {
-    id: "14",
-    title: "Design Controls for Medical Devices",
-    description: "Guidance on design control requirements for medical device development",
-    date: "2024/6/12",
-    organization: "Center for Devices and Radiological Health",
-    size: "567.89 KB",
-    status: "Final",
-    topics: ["Design Controls", "Premarket"],
-    icon: "file"
-  }
-];
 
 export default function FDAGuidancePage() {
+  // 搜索状态
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  // 筛选状态
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedOrganization, setSelectedOrganization] = useState("All Organizations");
   const [selectedTopic, setSelectedTopic] = useState("All Topics");
+
+  // 日期范围筛选状态
+  const [dateRange, setDateRange] = useState<DateRange>({ start: "", end: "" });
+
+  // UI 状态
   const [expandedDocs, setExpandedDocs] = useState<Set<string>>(new Set());
   const [previewDoc, setPreviewDoc] = useState<GuidanceDocument | null>(null);
 
+  // 书签功能
   const { bookmarks, addBookmark, removeBookmark, isBookmarked } = useBookmarks();
 
-  const statusOptions = ["All Statuses", "Final", "Draft"];
+  // 日期格式化函数：将 "2025/8/18" 转换为 "Aug 18, 2025"
+  const formatDate = (dateStr: string): string => {
+    const [year, month, day] = dateStr.split('/');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
-  const organizationOptions = [
-    "All Organizations",
-    "Center for Drug Evaluation and Research",
-    "Center for Devices and Radiological Health",
-    "Center for Biologics Evaluation and Research",
-    "Oncology Center of Excellence",
-    "Office of the Commissioner",
-    "Office of Women's Health"
-  ];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  const topicOptions = [
-    "All Topics",
-    "Clinical - Medical",
-    "Digital Health",
-    "Cybersecurity",
-    "Premarket",
-    "Quality Systems",
-    "Software",
-    "AI/ML",
-    "Manufacturing",
-    "Design Controls",
-    "ICH-Efficacy",
-    "Clinical Trials",
-    "Biosimilars",
-    "Generic Drugs",
-    "ANDA",
-    "IND",
-    "BLA",
-    "Oncology",
-    "Administrative / Procedural",
-    "Product Development"
-  ];
+    return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
 
-  // 使用组件外部定义的常量数据
+  // 搜索防抖：300ms 延迟
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
+  // 日期范围快捷选项
+  const setDateRangePreset = (preset: string) => {
+    const today = new Date();
+    const end = today.toISOString().split('T')[0];
+    let start = "";
+
+    switch(preset) {
+      case "30days": {
+        const date = new Date(today);
+        date.setDate(date.getDate() - 30);
+        start = date.toISOString().split('T')[0];
+        break;
+      }
+      case "6months": {
+        const date = new Date(today);
+        date.setMonth(date.getMonth() - 6);
+        start = date.toISOString().split('T')[0];
+        break;
+      }
+      case "1year": {
+        const date = new Date(today);
+        date.setFullYear(date.getFullYear() - 1);
+        start = date.toISOString().split('T')[0];
+        break;
+      }
+      case "all":
+        start = "";
+        setDateRange({ start: "", end: "" });
+        return;
+    }
+
+    setDateRange({ start, end });
+  };
+
+  // 清除所有筛选
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setDebouncedSearchQuery("");
+    setSelectedStatus("All Statuses");
+    setSelectedOrganization("All Organizations");
+    setSelectedTopic("All Topics");
+    setDateRange({ start: "", end: "" });
+  };
+
+  // 文档筛选逻辑（增强版）
   const filteredDocuments = useMemo(() => {
-    return ALL_DOCUMENTS.filter(doc => {
-      const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           doc.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return FDA_GUIDANCE_DOCUMENTS.filter(doc => {
+      // 搜索匹配：标题、描述、标签
+      const matchesSearch =
+        debouncedSearchQuery === "" ||
+        doc.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        doc.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        doc.topics.some(topic => topic.toLowerCase().includes(debouncedSearchQuery.toLowerCase()));
+
+      // 状态筛选
       const matchesStatus = selectedStatus === "All Statuses" || doc.status === selectedStatus;
+
+      // 组织筛选
       const matchesOrganization = selectedOrganization === "All Organizations" ||
                                   doc.organization === selectedOrganization;
+
+      // 主题筛选
       const matchesTopic = selectedTopic === "All Topics" ||
                           doc.topics.includes(selectedTopic);
 
-      return matchesSearch && matchesStatus && matchesOrganization && matchesTopic;
+      // 日期范围筛选
+      let matchesDateRange = true;
+      if (dateRange.start || dateRange.end) {
+        // 将 "2025/8/18" 转换为 "2025-08-18"
+        const docDateStr = doc.date.replace(/\//g, '-');
+        const docDate = new Date(docDateStr);
+
+        if (dateRange.start) {
+          const startDate = new Date(dateRange.start);
+          if (docDate < startDate) matchesDateRange = false;
+        }
+
+        if (dateRange.end) {
+          const endDate = new Date(dateRange.end);
+          if (docDate > endDate) matchesDateRange = false;
+        }
+      }
+
+      return matchesSearch && matchesStatus && matchesOrganization && matchesTopic && matchesDateRange;
     });
-  }, [searchQuery, selectedStatus, selectedOrganization, selectedTopic]);
+  }, [debouncedSearchQuery, selectedStatus, selectedOrganization, selectedTopic, dateRange]);
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedDocs);
@@ -295,9 +195,9 @@ export default function FDAGuidancePage() {
     const rows = filteredDocuments.map(doc => [
       doc.title,
       doc.description,
-      doc.date,
+      formatDate(doc.date),
       doc.organization,
-      doc.size,
+      doc.size || "N/A",
       doc.status,
       doc.topics.join("; ")
     ]);
@@ -321,10 +221,10 @@ export default function FDAGuidancePage() {
     const printContent = filteredDocuments.map(doc => `
       ${doc.title}
       ${doc.description}
-      Date: ${doc.date} | Organization: ${doc.organization}
-      Status: ${doc.status} | Size: ${doc.size}
+      Date: ${formatDate(doc.date)} | Organization: ${doc.organization}
+      Status: ${doc.status}${doc.size ? ` | Size: ${doc.size}` : ''}
       Topics: ${doc.topics.join(", ")}
-      ${doc.commentPeriodCloses ? `Comment period closes: ${doc.commentPeriodCloses}` : ''}
+      ${doc.commentPeriodCloses ? `Comment period closes: ${formatDate(doc.commentPeriodCloses)}` : ''}
       ---
     `).join("\n\n");
 
@@ -355,7 +255,7 @@ export default function FDAGuidancePage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gray-50" lang="en-US">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -404,7 +304,7 @@ export default function FDAGuidancePage() {
             </div>
 
             {/* Filter Dropdowns */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select
@@ -412,7 +312,7 @@ export default function FDAGuidancePage() {
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
-                  {statusOptions.map(option => (
+                  {STATUS_OPTIONS.map(option => (
                     <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
@@ -425,7 +325,7 @@ export default function FDAGuidancePage() {
                   onChange={(e) => setSelectedOrganization(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
-                  {organizationOptions.map(option => (
+                  {ORGANIZATION_OPTIONS.map(option => (
                     <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
@@ -438,12 +338,92 @@ export default function FDAGuidancePage() {
                   onChange={(e) => setSelectedTopic(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
-                  {topicOptions.map(option => (
+                  {TOPIC_OPTIONS.map(option => (
                     <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
               </div>
             </div>
+
+            {/* Date Range Filter */}
+            <div className="border-t border-gray-200 pt-4" lang="en-US">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Date Range</label>
+
+              {/* Quick Presets */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDateRangePreset("30days")}
+                  className="text-xs"
+                >
+                  Last 30 Days
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDateRangePreset("6months")}
+                  className="text-xs"
+                >
+                  Last 6 Months
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDateRangePreset("1year")}
+                  className="text-xs"
+                >
+                  Last Year
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDateRangePreset("all")}
+                  className="text-xs"
+                >
+                  All Time
+                </Button>
+              </div>
+
+              {/* Custom Date Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" lang="en-US">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    lang="en-US"
+                    value={dateRange.start}
+                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">End Date</label>
+                  <input
+                    type="date"
+                    lang="en-US"
+                    value={dateRange.end}
+                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            {(debouncedSearchQuery || selectedStatus !== "All Statuses" || selectedOrganization !== "All Organizations" || selectedTopic !== "All Topics" || dateRange.start || dateRange.end) && (
+              <div className="mt-4 flex justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Clear All Filters
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -470,16 +450,18 @@ export default function FDAGuidancePage() {
                       <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {doc.date}
+                          {formatDate(doc.date)}
                         </div>
                         <div className="flex items-center gap-1">
                           <Building2 className="w-4 h-4" />
                           {doc.organization}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Download className="w-4 h-4" />
-                          {doc.size}
-                        </div>
+                        {doc.size && (
+                          <div className="flex items-center gap-1">
+                            <Download className="w-4 h-4" />
+                            {doc.size}
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2">
@@ -502,13 +484,28 @@ export default function FDAGuidancePage() {
                       {doc.commentPeriodCloses && (
                         <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2">
                           <AlertCircle className="w-4 h-4 text-orange-600" />
-                          <span className="text-sm text-orange-800">Comment period closes: {doc.commentPeriodCloses}</span>
+                          <span className="text-sm text-orange-800">Comment period closes: {formatDate(doc.commentPeriodCloses)}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="flex flex-col items-end gap-2">
+                    {/* Bookmark Button */}
+                    <button
+                      onClick={() => handleBookmark(doc)}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      title={isBookmarked(doc.id) ? "Remove bookmark" : "Add bookmark"}
+                    >
+                      <Heart
+                        className={`w-5 h-5 transition-colors ${
+                          isBookmarked(doc.id)
+                            ? 'fill-pink-600 text-pink-600'
+                            : 'text-gray-400 hover:text-pink-400'
+                        }`}
+                      />
+                    </button>
+
                     <Button className="bg-blue-600 hover:bg-blue-700">
                       <ExternalLink className="w-4 h-4 mr-2" />
                       View Document

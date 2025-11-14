@@ -41,9 +41,27 @@ export interface FetchGuidanceResult {
 }
 
 /**
+ * 数据库记录接口
+ */
+interface DatabaseRecord {
+  id: string;
+  title: string;
+  description: string;
+  issue_date: string;
+  organization: string;
+  file_size: string | null;
+  status: string;
+  topics: string[];
+  comment_period_closes: string | null;
+  regulatory_pathways: string[] | null;
+  device_class: string[] | null;
+  url: string | null;
+}
+
+/**
  * 将数据库记录转换为GuidanceDocument格式
  */
-function transformDatabaseRecord(record: any): GuidanceDocument {
+function transformDatabaseRecord(record: DatabaseRecord): GuidanceDocument {
   // 将ISO日期格式（YYYY-MM-DD）转换为显示格式（YYYY/M/D）
   const formatDateForDisplay = (isoDate: string): string => {
     const date = new Date(isoDate);
